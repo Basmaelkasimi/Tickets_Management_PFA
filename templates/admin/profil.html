@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Profil - Administration</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body class="admin-dashboard-page">
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="user-sidebar">
+
+        <div class="user-brand">
+
+            <div class="brand-mark">
+                TM
+            </div>
+
+            <div>
+                <strong>Ticket Management</strong>
+                <span>Helpdesk</span>
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                ADMINISTRATION
+            </span>
+
+            <a
+                href="{{ url_for('dashboard_admin') }}"
+                class="sidebar-item"
+            >
+                Tableau de bord
+            </a>
+
+            <a
+                href="{{ url_for('admin_tickets') }}"
+                class="sidebar-item"
+            >
+                Tickets
+            </a>
+
+            <a
+                href="{{ url_for('admin_historique') }}"
+                class="sidebar-item"
+            >
+                Historique
+            </a>
+
+            <a
+                href="{{ url_for('admin_notifications') }}"
+                class="sidebar-item"
+            >
+                Notifications
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                GESTION
+            </span>
+
+            <a
+                href="{{ url_for('admin_utilisateurs') }}"
+                class="sidebar-item"
+            >
+                Utilisateurs
+            </a>
+
+            <a
+                href="{{ url_for('admin_techniciens') }}"
+                class="sidebar-item"
+            >
+                Techniciens
+            </a>
+
+            <a
+                href="{{ url_for('admin_categories') }}"
+                class="sidebar-item"
+            >
+                Catégories
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                COMPTE
+            </span>
+
+            <a
+                href="{{ url_for('admin_profil') }}"
+                class="sidebar-item active"
+            >
+                Profil
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <span class="sidebar-user">
+                {{ current_user.nom }}
+            </span>
+
+            <span class="sidebar-role">
+                Administrateur
+            </span>
+
+            <a
+                href="{{ url_for('logout') }}"
+                class="sidebar-item"
+            >
+                Déconnexion
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- CONTENU -->
+    <main class="user-main">
+
+        <div class="dashboard-header">
+
+            <div>
+
+                <h1>Profil</h1>
+
+                <p>
+                    Consultez et modifiez vos informations personnelles.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- MESSAGES FLASH -->
+        {% with messages = get_flashed_messages() %}
+
+            {% if messages %}
+
+                <div class="flash-container">
+
+                    {% for message in messages %}
+
+                        <div class="flash-message">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- CARTE PROFIL -->
+        <section class="dashboard-card admin-profile-card">
+
+            <!-- HEADER PROFIL -->
+            <div class="profile-header">
+
+                <div class="profile-avatar">
+                    {{ current_user.nom[0]|upper }}
+                </div>
+
+                <div>
+
+                    <h2>
+                        {{ current_user.nom }}
+                    </h2>
+
+                    <span>
+                        Administrateur
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- FORMULAIRE -->
+            <form
+                method="POST"
+                action="{{ url_for('admin_profil') }}"
+                class="admin-profile-form"
+            >
+
+                <!-- NOM -->
+                <div class="form-group">
+
+                    <label for="nom">
+                        Nom
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nom"
+                        name="nom"
+                        value="{{ current_user.nom }}"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- EMAIL -->
+                <div class="form-group">
+
+                    <label for="email">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value="{{ current_user.email }}"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- ROLE -->
+                <div class="profile-info-row">
+
+                    <span>
+                        Rôle
+                    </span>
+
+                    <strong>
+                        {{ current_user.role.value }}
+                    </strong>
+
+                </div>
+
+
+                <!-- DATE CREATION -->
+                <div class="profile-info-row">
+
+                    <span>
+                        Compte créé le
+                    </span>
+
+                    <strong>
+                        {{ current_user.date_creation.strftime('%d/%m/%Y') }}
+                    </strong>
+
+                </div>
+
+
+                <!-- MOT DE PASSE -->
+                <div class="password-section">
+
+                    <div class="password-section-title">
+
+                        <h3>
+                            Modifier le mot de passe
+                        </h3>
+
+                        <p>
+                            Laissez ces champs vides si vous ne souhaitez pas
+                            modifier votre mot de passe.
+                        </p>
+
+                    </div>
+
+
+                    <!-- ANCIEN -->
+                    <div class="form-group">
+
+                        <label for="ancien_mot_de_passe">
+                            Mot de passe actuel
+                        </label>
+
+                        <input
+                            type="password"
+                            id="ancien_mot_de_passe"
+                            name="ancien_mot_de_passe"
+                            placeholder="Votre mot de passe actuel"
+                        >
+
+                    </div>
+
+
+                    <!-- NOUVEAU -->
+                    <div class="form-group">
+
+                        <label for="nouveau_mot_de_passe">
+                            Nouveau mot de passe
+                        </label>
+
+                        <input
+                            type="password"
+                            id="nouveau_mot_de_passe"
+                            name="nouveau_mot_de_passe"
+                            placeholder="Minimum 6 caractères"
+                        >
+
+                    </div>
+
+
+                    <!-- CONFIRMATION -->
+                    <div class="form-group">
+
+                        <label for="confirmation_mot_de_passe">
+                            Confirmer le nouveau mot de passe
+                        </label>
+
+                        <input
+                            type="password"
+                            id="confirmation_mot_de_passe"
+                            name="confirmation_mot_de_passe"
+                            placeholder="Confirmez le nouveau mot de passe"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- BOUTON -->
+                <button type="submit">
+                    Enregistrer les modifications
+                </button>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

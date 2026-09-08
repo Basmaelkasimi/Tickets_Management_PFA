@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Nouveau ticket - Ticket Management</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body class="user-dashboard-page">
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+
+    <aside class="user-sidebar">
+
+        <div class="user-brand">
+
+            <div class="brand-mark">
+                TM
+            </div>
+
+            <div>
+                <strong>Ticket Management</strong>
+                <span>Helpdesk</span>
+            </div>
+
+        </div>
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                ESPACE UTILISATEUR
+            </span>
+
+            <a
+                href="{{ url_for('dashboard_user') }}"
+                class="sidebar-item"
+            >
+                Tableau de bord
+            </a>
+
+            <a href="#" class="sidebar-item">
+                Mes tickets
+            </a>
+
+            <a
+                href="{{ url_for('creer_ticket') }}"
+                class="sidebar-item active"
+            >
+                Nouveau ticket
+            </a>
+
+        </div>
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                COMPTE
+            </span>
+
+            <a href="#" class="sidebar-item">
+                Notifications
+            </a>
+
+            <a href="#" class="sidebar-item">
+                Mon profil
+            </a>
+
+        </div>
+
+        <div class="sidebar-bottom">
+
+            <div class="sidebar-user">
+
+                <div class="avatar">
+                    {{ current_user.nom[0] }}
+                </div>
+
+                <div>
+                    <strong>{{ current_user.nom }}</strong>
+                    <span>Utilisateur</span>
+                </div>
+
+            </div>
+
+            <a
+                href="{{ url_for('logout') }}"
+                class="sidebar-logout"
+            >
+                Se déconnecter
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- CONTENT -->
+
+    <main class="user-content">
+
+        <div class="user-topbar">
+
+            <div></div>
+
+            <div class="top-user">
+                <strong>{{ current_user.nom }}</strong>
+                <span>Utilisateur</span>
+            </div>
+
+        </div>
+
+
+        <div class="ticket-form-page">
+
+            <div class="form-page-header">
+
+                <span class="eyebrow">
+                    NOUVELLE DEMANDE
+                </span>
+
+                <h1>Créer un ticket</h1>
+
+                <p>
+                    Décrivez votre problème afin que l'équipe
+                    technique puisse le traiter efficacement.
+                </p>
+
+            </div>
+
+
+            {% with messages = get_flashed_messages() %}
+
+                {% if messages %}
+
+                    <div class="alert">
+
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+            {% endwith %}
+
+
+            <form
+                method="POST"
+                class="ticket-form-card"
+            >
+
+                <div class="ticket-form-group">
+
+                    <label for="titre">
+                        Titre du ticket *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="titre"
+                        name="titre"
+                        placeholder="Ex : Problème de connexion Wi-Fi"
+                        maxlength="150"
+                        required
+                    >
+
+                    <small>
+                        Résumez le problème en quelques mots.
+                    </small>
+
+                </div>
+
+
+                <div class="ticket-form-group">
+
+                    <label for="description">
+                        Description *
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        rows="7"
+                        placeholder="Décrivez précisément le problème rencontré..."
+                        required
+                    ></textarea>
+
+                </div>
+
+
+                <div class="ticket-form-row">
+
+                    <div class="ticket-form-group">
+
+                        <label for="categorie_id">
+                            Catégorie *
+                        </label>
+
+                        <select
+                            id="categorie_id"
+                            name="categorie_id"
+                            required
+                        >
+
+                            <option value="">
+                                Sélectionner une catégorie
+                            </option>
+
+                            {% for categorie in categories %}
+
+                                <option value="{{ categorie.id }}">
+                                    {{ categorie.nom }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="ticket-form-group">
+
+                        <label for="priorite">
+                            Priorité *
+                        </label>
+
+                        <select
+                            id="priorite"
+                            name="priorite"
+                            required
+                        >
+
+                            <option value="">
+                                Sélectionner une priorité
+                            </option>
+
+                            <option value="FAIBLE">
+                                Faible
+                            </option>
+
+                            <option value="MOYENNE">
+                                Moyenne
+                            </option>
+
+                            <option value="HAUTE">
+                                Haute
+                            </option>
+
+                            <option value="CRITIQUE">
+                                Critique
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-info-box">
+
+                    <strong>Après création</strong>
+
+                    <p>
+                        Votre ticket recevra automatiquement
+                        le statut « Nouveau » puis sera pris
+                        en charge par un technicien après
+                        affectation.
+                    </p>
+
+                </div>
+
+
+                <div class="ticket-form-actions">
+
+                    <a
+                        href="{{ url_for('dashboard_user') }}"
+                        class="cancel-button"
+                    >
+                        Annuler
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="submit-ticket-button"
+                    >
+                        Créer le ticket
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mon profil - Ticket Management</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body class="user-dashboard-page">
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="user-sidebar">
+
+        <div class="user-brand">
+
+            <div class="brand-mark">TM</div>
+
+            <div>
+                <strong>Ticket Management</strong>
+                <span>Helpdesk</span>
+            </div>
+
+        </div>
+
+
+        <!-- ESPACE UTILISATEUR -->
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                ESPACE UTILISATEUR
+            </span>
+
+            <a href="{{ url_for('dashboard_user') }}" class="sidebar-item">
+                Tableau de bord
+            </a>
+
+            <a href="{{ url_for('dashboard_user') }}" class="sidebar-item">
+                Mes tickets
+            </a>
+
+            <a href="{{ url_for('creer_ticket') }}" class="sidebar-item">
+                Nouveau ticket
+            </a>
+
+        </div>
+
+
+        <!-- SUIVI -->
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                SUIVI
+            </span>
+
+            <a href="{{ url_for('dashboard_user', statut='EN_COURS') }}"
+               class="sidebar-item">
+                En cours
+            </a>
+
+            <a href="{{ url_for('dashboard_user', statut='EN_ATTENTE') }}"
+               class="sidebar-item">
+                En attente
+            </a>
+
+            <a href="{{ url_for('dashboard_user', statut='RESOLU') }}"
+               class="sidebar-item">
+                Résolus
+            </a>
+
+            <a href="{{ url_for('historique_user') }}"
+               class="sidebar-item">
+                Historique
+            </a>
+
+        </div>
+
+
+        <!-- COMPTE -->
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                COMPTE
+            </span>
+
+            <a href="{{ url_for('notifications_user') }}"
+               class="sidebar-item">
+                Notifications
+            </a>
+
+            <a href="{{ url_for('profil_user') }}"
+               class="sidebar-item active">
+                Mon profil
+            </a>
+
+        </div>
+
+
+        <!-- USER -->
+        <div class="sidebar-bottom">
+
+            <div class="sidebar-user">
+
+                <div class="avatar">
+                    {{ current_user.nom[0]|upper }}
+                </div>
+
+                <div>
+                    <strong>{{ current_user.nom }}</strong>
+                    <span>Utilisateur</span>
+                </div>
+
+            </div>
+
+            <a href="{{ url_for('logout') }}"
+               class="sidebar-logout">
+                Se déconnecter
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- CONTENU -->
+    <main class="user-content">
+
+        <!-- TOPBAR -->
+        <div class="user-topbar">
+
+            <div class="search-box">
+
+                <form method="GET"
+                      action="{{ url_for('dashboard_user') }}"
+                      class="search-form">
+
+                    <input
+                        type="text"
+                        name="q"
+                        placeholder="Rechercher un ticket..."
+                    >
+
+                </form>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="notification-circle">
+                    0
+                </div>
+
+                <div class="top-user">
+                    <strong>{{ current_user.nom }}</strong>
+                    <span>Utilisateur</span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- INTRO -->
+        <section class="dashboard-intro">
+
+            <div>
+
+                <span class="eyebrow">
+                    COMPTE
+                </span>
+
+                <h1>
+                    Mon profil
+                </h1>
+
+                <p>
+                    Consultez et modifiez vos informations personnelles.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- FORMULAIRE PROFIL -->
+    <div class="profile-layout">
+
+    <!-- CARTE IDENTITE -->
+    <aside class="profile-summary-card">
+
+        <div class="profile-big-avatar">
+            {{ current_user.nom[0]|upper }}
+        </div>
+
+        <h2>{{ current_user.nom }}</h2>
+        <p>{{ current_user.email }}</p>
+
+        <span class="profile-role-badge">
+            Utilisateur
+        </span>
+
+        <div class="profile-summary-info">
+
+            <div>
+                <span>Compte</span>
+                <strong>Actif</strong>
+            </div>
+
+            <div>
+                <span>Membre depuis</span>
+                <strong>
+                    {{ current_user.date_creation.strftime('%d/%m/%Y') }}
+                </strong>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- INFORMATIONS -->
+    <section class="profile-settings-card">
+
+        <div class="profile-section-header">
+            <div>
+                <span class="profile-small-label">PARAMÈTRES DU COMPTE</span>
+                <h2>Informations personnelles</h2>
+                <p>
+                    Gérez les informations associées à votre compte.
+                </p>
+            </div>
+        </div>
+
+
+        <!-- FLASH -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="profile-success">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+
+        <form method="POST"
+              action="{{ url_for('profil_user') }}"
+              class="modern-profile-form">
+
+            <div class="profile-form-row">
+
+                <div class="modern-field">
+                    <label for="nom">Nom complet</label>
+
+                    <input
+                        id="nom"
+                        type="text"
+                        name="nom"
+                        value="{{ current_user.nom }}"
+                        required
+                    >
+                </div>
+
+                <div class="modern-field">
+                    <label>Rôle</label>
+
+                    <input
+                        type="text"
+                        value="Utilisateur"
+                        disabled
+                    >
+                </div>
+
+            </div>
+
+
+            <div class="modern-field">
+
+                <label for="email">
+                    Adresse email
+                </label>
+
+                <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    value="{{ current_user.email }}"
+                    required
+                >
+
+            </div>
+
+
+            <!-- SECURITE -->
+            <div class="profile-security">
+
+                <div class="security-title">
+                    <span>SÉCURITÉ</span>
+                    <h3>Mot de passe</h3>
+                    <p>
+                        Modifiez votre mot de passe uniquement si nécessaire.
+                    </p>
+                </div>
+
+                <div class="modern-field">
+
+                    <label for="nouveau_mot_de_passe">
+                        Nouveau mot de passe
+                    </label>
+
+                    <input
+                        id="nouveau_mot_de_passe"
+                        type="password"
+                        name="nouveau_mot_de_passe"
+                        placeholder="••••••••••••"
+                    >
+
+                    <small>
+                        Laissez ce champ vide pour conserver votre mot de passe actuel.
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="modern-profile-actions">
+
+                <a href="{{ url_for('dashboard_user') }}"
+                   class="profile-cancel-btn">
+                    Annuler
+                </a>
+
+                <button type="submit"
+                        class="profile-save-btn">
+                    Enregistrer les modifications
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

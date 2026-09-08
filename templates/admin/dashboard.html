@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Administration - Ticket Management</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body class="admin-dashboard-page">
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="user-sidebar">
+
+        <div class="user-brand">
+
+            <div class="brand-mark">
+                TM
+            </div>
+
+            <div>
+                <strong>Ticket Management</strong>
+                <span>Helpdesk</span>
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                ADMINISTRATION
+            </span>
+
+            <a
+                href="{{ url_for('dashboard_admin') }}"
+                class="sidebar-item active"
+            >
+                Tableau de bord
+            </a>
+
+           <a
+    href="{{ url_for('admin_tickets') }}"
+    class="sidebar-item"
+>
+    Tickets
+</a>
+
+            <a href="{{ url_for('admin_historique') }}"
+   class="sidebar-item">
+    Historique
+</a>
+
+           <a href="{{ url_for('admin_notifications') }}"
+   class="sidebar-item">
+    Notifications
+</a>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                GESTION
+            </span>
+
+          <a href="{{ url_for('admin_utilisateurs') }}"
+   class="sidebar-item">
+    Utilisateurs
+</a>
+
+            <a href="{{ url_for('admin_techniciens') }}"
+   class="sidebar-item">
+    Techniciens
+</a>
+
+           <a href="{{ url_for('admin_categories') }}"
+   class="sidebar-item">
+    Catégories
+</a>
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                COMPTE
+            </span>
+
+         <a href="{{ url_for('admin_profil') }}"
+   class="sidebar-item">
+    Profil
+</a>
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <span class="sidebar-user">
+                {{ current_user.nom }}
+            </span>
+
+            <span class="sidebar-role">
+                Administrateur
+            </span>
+
+            <a
+                href="{{ url_for('logout') }}"
+                class="sidebar-item"
+            >
+                Déconnexion
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- CONTENU PRINCIPAL -->
+    <main class="user-main">
+
+        <!-- HEADER -->
+        <div class="dashboard-header">
+
+            <div>
+
+                <h1>
+                    Tableau de bord administrateur
+                </h1>
+
+                <p>
+                    Bienvenue {{ current_user.nom }},
+                    gérez les tickets et les utilisateurs de la plateforme.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- MESSAGES FLASH -->
+        {% with messages = get_flashed_messages() %}
+
+            {% if messages %}
+
+                <div class="flash-container">
+
+                    {% for message in messages %}
+
+                        <div class="flash-message">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- STATISTIQUES -->
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <span>
+                    Total tickets
+                </span>
+
+                <strong>
+                    {{ total_tickets }}
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>
+                    Nouveaux
+                </span>
+
+                <strong>
+                    {{ tickets_nouveaux }}
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>
+                    En cours
+                </span>
+
+                <strong>
+                    {{ tickets_en_cours }}
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>
+                    Résolus
+                </span>
+
+                <strong>
+                    {{ tickets_resolus }}
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- ZONE PRINCIPALE -->
+        <section class="admin-dashboard-grid">
+
+            <!-- TICKETS RECENTS -->
+            <div class="dashboard-card dashboard-card-large">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h2>
+                            Tickets récents
+                        </h2>
+
+                        <p>
+                            Dernières demandes créées
+                        </p>
+
+                    </div>
+
+                    <span>
+                        {{ tickets_recents|length }} ticket(s)
+                    </span>
+
+                </div>
+
+
+                {% if tickets_recents %}
+
+                    {% for ticket in tickets_recents %}
+
+                        <div class="admin-recent-ticket">
+
+                            <div>
+
+                                <strong>
+                                    #{{ ticket.id }} - {{ ticket.titre }}
+                                </strong>
+
+                                <span>
+                                    {{ ticket.demandeur.nom }}
+                                    ·
+                                    {{ ticket.categorie.nom }}
+                                </span>
+
+                            </div>
+
+                            <div class="admin-ticket-right">
+
+                                <span
+                                    class="ticket-status
+                                    status-{{ ticket.statut.value|lower }}"
+                                >
+                                    {{ ticket.statut.value.replace('_', ' ') }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <h3>
+                            Aucun ticket
+                        </h3>
+
+                        <p>
+                            Aucun ticket disponible.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- REPARTITION -->
+            <div class="dashboard-card">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h2>
+                            Répartition par statut
+                        </h2>
+
+                        <p>
+                            Vue globale des tickets
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="status-summary">
+
+                    <div>
+                        <span>Nouveaux</span>
+                        <strong>{{ tickets_nouveaux }}</strong>
+                    </div>
+
+                    <div>
+                        <span>En cours</span>
+                        <strong>{{ tickets_en_cours }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Résolus</span>
+                        <strong>{{ tickets_resolus }}</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- TICKETS A ASSIGNER -->
+        <section class="dashboard-card admin-assignment-card">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+                        Gestion des affectations
+                    </h2>
+
+                    <p>
+                        Assignez les tickets aux techniciens
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            {% if tickets %}
+
+                {% for ticket in tickets %}
+
+                    <div class="ticket-list-item">
+
+                        <div class="admin-ticket-info">
+
+                            <div class="admin-ticket-title">
+
+                                <strong>
+                                    #{{ ticket.id }} - {{ ticket.titre }}
+                                </strong>
+
+                                <span
+                                    class="ticket-status
+                                    status-{{ ticket.statut.value|lower }}"
+                                >
+                                    {{ ticket.statut.value.replace('_', ' ') }}
+                                </span>
+
+                            </div>
+
+
+                            <div class="admin-ticket-details">
+
+                                <span>
+                                    Demandeur :
+                                    <strong>
+                                        {{ ticket.demandeur.nom }}
+                                    </strong>
+                                </span>
+
+                                <span>
+                                    Catégorie :
+                                    <strong>
+                                        {{ ticket.categorie.nom }}
+                                    </strong>
+                                </span>
+
+                                <span>
+                                    Priorité :
+                                    <strong>
+                                        {{ ticket.priorite.value }}
+                                    </strong>
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        {% if ticket.technicien %}
+
+                            <div class="assigned-tech">
+
+                                <strong>
+                                    Technicien assigné
+                                </strong>
+
+                                <span>
+                                    {{ ticket.technicien.nom }}
+                                </span>
+
+                            </div>
+
+                        {% else %}
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'assigner_ticket',
+                                    ticket_id=ticket.id
+                                ) }}"
+                                class="assign-form"
+                            >
+
+                                <select
+                                    name="technicien_id"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Choisir un technicien
+                                    </option>
+
+                                    {% for technicien in techniciens %}
+
+                                        <option
+                                            value="{{ technicien.id }}"
+                                        >
+                                            {{ technicien.nom }}
+                                        </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+
+                                <button type="submit">
+                                    Assigner
+                                </button>
+
+                            </form>
+
+                        {% endif %}
+
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

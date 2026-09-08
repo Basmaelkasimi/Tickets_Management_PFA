@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Catégories - Administration</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body class="admin-dashboard-page">
+
+<div class="app-shell">
+
+    <aside class="user-sidebar">
+
+        <div class="user-brand">
+            <div class="brand-mark">TM</div>
+
+            <div>
+                <strong>Ticket Management</strong>
+                <span>Helpdesk</span>
+            </div>
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                ADMINISTRATION
+            </span>
+
+            <a href="{{ url_for('dashboard_admin') }}"
+               class="sidebar-item">
+                Tableau de bord
+            </a>
+
+            <a href="{{ url_for('admin_tickets') }}"
+               class="sidebar-item">
+                Tickets
+            </a>
+
+            <a href="{{ url_for('admin_historique') }}"
+               class="sidebar-item">
+                Historique
+            </a>
+
+            <a href="{{ url_for('admin_notifications') }}"
+               class="sidebar-item">
+                Notifications
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                GESTION
+            </span>
+
+            <a href="{{ url_for('admin_utilisateurs') }}"
+               class="sidebar-item">
+                Utilisateurs
+            </a>
+
+            <a href="{{ url_for('admin_techniciens') }}"
+               class="sidebar-item">
+                Techniciens
+            </a>
+
+            <a href="{{ url_for('admin_categories') }}"
+               class="sidebar-item active">
+                Catégories
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                COMPTE
+            </span>
+
+           <a href="{{ url_for('admin_profil') }}"
+   class="sidebar-item">
+    Profil
+</a>
+
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <span class="sidebar-user">
+                {{ current_user.nom }}
+            </span>
+
+            <span class="sidebar-role">
+                Administrateur
+            </span>
+
+            <a href="{{ url_for('logout') }}"
+               class="sidebar-item">
+                Déconnexion
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <main class="user-main">
+
+        <div class="dashboard-header">
+
+            <h1>Catégories</h1>
+
+            <p>
+                Gérez les catégories utilisées pour classer les tickets.
+            </p>
+
+        </div>
+
+
+        {% with messages = get_flashed_messages() %}
+
+            {% if messages %}
+
+                <div class="flash-container">
+
+                    {% for message in messages %}
+
+                        <div class="flash-message">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <div class="admin-categories-grid">
+
+            <!-- AJOUT -->
+            <section class="dashboard-card category-form-card">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>Nouvelle catégorie</h2>
+                        <p>Ajouter une catégorie de ticket</p>
+                    </div>
+
+                </div>
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for('admin_ajouter_categorie') }}"
+                    class="category-form"
+                >
+
+                    <div class="form-group">
+
+                        <label for="nom">
+                            Nom
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nom"
+                            name="nom"
+                            placeholder="Ex : Réseau"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="description">
+                            Description
+                        </label>
+
+                        <textarea
+                            id="description"
+                            name="description"
+                            rows="4"
+                            placeholder="Description de la catégorie..."
+                        ></textarea>
+
+                    </div>
+
+
+                    <button type="submit">
+                        Ajouter la catégorie
+                    </button>
+
+                </form>
+
+            </section>
+
+
+            <!-- LISTE -->
+            <section class="dashboard-card categories-list-card">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>Liste des catégories</h2>
+                        <p>Catégories disponibles</p>
+                    </div>
+
+                    <span>
+                        {{ categories|length }} catégorie(s)
+                    </span>
+
+                </div>
+
+
+                {% if categories %}
+
+                    <div class="categories-list">
+
+                        {% for categorie in categories %}
+
+                            <div class="category-item">
+
+                                <div>
+
+                                    <strong>
+                                        {{ categorie.nom }}
+                                    </strong>
+
+                                    <p>
+                                        {{ categorie.description or "Aucune description" }}
+                                    </p>
+
+                                </div>
+
+                                <span class="category-ticket-count">
+                                    {{ categorie.tickets|length }} ticket(s)
+                                </span>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <h3>Aucune catégorie</h3>
+
+                        <p>
+                            Ajoutez votre première catégorie.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

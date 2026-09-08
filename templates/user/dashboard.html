@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mes tickets - Ticket Management</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+
+<body class="user-dashboard-page">
+
+<div class="app-shell">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="user-sidebar">
+
+        <div class="user-brand">
+
+            <div class="brand-mark">
+                TM
+            </div>
+
+            <div>
+                <strong>Ticket Management</strong>
+                <span>Helpdesk</span>
+            </div>
+
+        </div>
+
+
+<!-- ESPACE UTILISATEUR -->
+<div class="sidebar-section">
+
+    <span class="sidebar-title">
+        ESPACE UTILISATEUR
+    </span>
+
+    <a href="{{ url_for('dashboard_user') }}" class="sidebar-item active">
+        Tableau de bord
+    </a>
+
+    <a href="{{ url_for('dashboard_user') }}" class="sidebar-item">
+        Mes tickets
+    </a>
+
+    <a href="{{ url_for('creer_ticket') }}" class="sidebar-item">
+        Nouveau ticket
+    </a>
+
+</div>
+
+
+<!-- SUIVI -->
+<div class="sidebar-section">
+
+    <span class="sidebar-title">
+        SUIVI
+    </span>
+
+    <a href="{{ url_for('dashboard_user', statut='EN_COURS') }}"
+       class="sidebar-item">
+        En cours
+    </a>
+
+    <a href="{{ url_for('dashboard_user', statut='EN_ATTENTE') }}"
+       class="sidebar-item">
+        En attente
+    </a>
+
+    <a href="{{ url_for('dashboard_user', statut='RESOLU') }}"
+       class="sidebar-item">
+        Résolus
+    </a>
+
+    <a href="{{ url_for('historique_user') }}"
+       class="sidebar-item">
+        Historique
+    </a>
+
+</div>
+
+
+<!-- COMPTE -->
+<div class="sidebar-section">
+
+    <span class="sidebar-title">
+        COMPTE
+    </span>
+
+    <a href="{{ url_for('notifications_user') }}"
+       class="sidebar-item">
+        Notifications
+    </a>
+
+    <a href="{{ url_for('profil_user') }}"
+       class="sidebar-item">
+        Mon profil
+    </a>
+
+</div>
+
+
+        <!-- USER -->
+
+        <div class="sidebar-bottom">
+
+            <div class="sidebar-user">
+
+                <div class="avatar">
+                    {{ current_user.nom[0]|upper }}
+                </div>
+
+                <div>
+                    <strong>{{ current_user.nom }}</strong>
+                    <span>Utilisateur</span>
+                </div>
+
+            </div>
+
+
+            <a
+                href="{{ url_for('logout') }}"
+                class="sidebar-logout"
+            >
+                Se déconnecter
+            </a>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         CONTENU PRINCIPAL
+    ====================================================== -->
+
+    <main class="user-content">
+
+
+        <!-- TOPBAR -->
+
+        <div class="user-topbar">
+
+            <div class="search-box">
+
+              <form method="GET" action="{{ url_for('dashboard_user') }}" class="search-form">
+    <input
+        type="text"
+        name="q"
+        placeholder="Rechercher un ticket..."
+        value="{{ request.args.get('q', '') }}"
+    >
+</form>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <div class="notification-circle">
+                    0
+                </div>
+
+
+                <div class="top-user">
+
+                    <strong>
+                        {{ current_user.nom }}
+                    </strong>
+
+                    <span>
+                        Utilisateur
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =====================================================
+             INTRODUCTION
+        ====================================================== -->
+
+        <section class="dashboard-intro">
+
+            <div>
+
+                <span class="eyebrow">
+                    SELF-SERVICE IT
+                </span>
+
+                <h1>
+                    Mes demandes & incidents
+                </h1>
+
+                <p>
+                    Déclarez un problème, suivez vos tickets
+                    et échangez avec le support technique.
+                </p>
+
+            </div>
+
+
+            <a
+                href="{{ url_for('creer_ticket') }}"
+                class="primary-action"
+            >
+                + Créer un nouveau ticket
+            </a>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             KPI
+        ====================================================== -->
+
+        <section class="kpi-grid">
+
+
+            <!-- OUVERTS -->
+
+            <article class="kpi-card">
+
+                <span class="kpi-title">
+                    Tickets ouverts
+                </span>
+
+                <strong>
+                    {{ tickets_ouverts }}
+                </strong>
+
+                <small>
+                    Demandes actuellement ouvertes
+                </small>
+
+            </article>
+
+
+
+            <!-- ATTENTE -->
+
+            <article class="kpi-card">
+
+                <span class="kpi-title">
+                    En attente
+                </span>
+
+                <strong>
+                    {{ tickets_attente }}
+                </strong>
+
+                <small>
+                    Tickets temporairement en attente
+                </small>
+
+            </article>
+
+
+
+            <!-- RESOLUS -->
+
+            <article class="kpi-card">
+
+                <span class="kpi-title">
+                    Résolus
+                </span>
+
+                <strong>
+                    {{ tickets_resolus }}
+                </strong>
+
+                <small>
+                    Tickets résolus ou fermés
+                </small>
+
+            </article>
+
+
+
+            <!-- TOTAL -->
+
+            <article class="kpi-card">
+
+                <span class="kpi-title">
+                    Total tickets
+                </span>
+
+                <strong>
+                    {{ total_tickets }}
+                </strong>
+
+                <small>
+                    Depuis la création du compte
+                </small>
+
+            </article>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             ESPACE TICKETS
+        ====================================================== -->
+
+        <section class="tickets-workspace">
+
+
+            <!-- =================================================
+                 COLONNE GAUCHE
+            ================================================== -->
+
+            <div class="tickets-column">
+
+
+                <!-- FILTRES -->
+
+                <div class="ticket-filters">
+
+                    <div class="filter-tabs">
+
+<div class="ticket-tabs">
+
+    <a href="{{ url_for('dashboard_user') }}"
+       class="ticket-tab {% if not request.args.get('statut') %}active{% endif %}">
+        Tous
+    </a>
+
+    <a href="{{ url_for('dashboard_user', statut='NOUVEAU') }}"
+       class="ticket-tab {% if request.args.get('statut') == 'NOUVEAU' %}active{% endif %}">
+        Nouveaux
+    </a>
+
+    <a href="{{ url_for('dashboard_user', statut='ASSIGNE') }}"
+       class="ticket-tab {% if request.args.get('statut') == 'ASSIGNE' %}active{% endif %}">
+        Assignés
+    </a>
+
+    <a href="{{ url_for('dashboard_user', statut='EN_COURS') }}"
+       class="ticket-tab {% if request.args.get('statut') == 'EN_COURS' %}active{% endif %}">
+        En cours
+    </a>
+
+    <a href="{{ url_for('dashboard_user', statut='RESOLU') }}"
+       class="ticket-tab {% if request.args.get('statut') == 'RESOLU' %}active{% endif %}">
+        Résolus
+    </a>
+
+</div>
+
+                    </div>
+
+
+                    <select class="ticket-sort">
+
+                        <option>
+                            Tri : Date récente
+                        </option>
+
+                        <option>
+                            Priorité
+                        </option>
+
+                        <option>
+                            Statut
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     LISTE DYNAMIQUE DES TICKETS
+                ================================================== -->
+
+                {% if tickets %}
+
+                    {% for ticket in tickets %}
+
+                       <article
+    class="ticket-card
+    {% if selected_ticket and selected_ticket.id == ticket.id %}
+        selected
+    {% endif %}"
+>
+
+                            <div class="ticket-card-top">
+
+                                <div>
+
+
+                                    <!-- INFORMATIONS -->
+
+                                    <div class="ticket-meta">
+
+                                        <strong>
+                                            #TK-{{ "%04d"|format(ticket.id) }}
+                                        </strong>
+
+
+                                        <span class="ticket-category">
+
+                                            {% if ticket.categorie %}
+                                                {{ ticket.categorie.nom }}
+                                            {% else %}
+                                                Sans catégorie
+                                            {% endif %}
+
+                                        </span>
+
+
+                                        <span
+                                            class="priority
+                                            {{ ticket.priorite.value|lower }}"
+                                        >
+                                            {{ ticket.priorite.value }}
+                                        </span>
+
+                                    </div>
+
+
+
+                                    <!-- TITRE -->
+
+                                    <h3>
+                                        {{ ticket.titre }}
+                                    </h3>
+
+
+
+                                    <!-- DESCRIPTION -->
+
+                                    <p>
+
+                                        {{ ticket.description[:100] }}
+
+                                        {% if ticket.description|length > 100 %}
+                                            ...
+                                        {% endif %}
+
+                                    </p>
+
+                                </div>
+
+
+
+                                <!-- STATUT -->
+
+                                <span class="ticket-status">
+
+                                    {{ ticket.statut.value.replace("_", " ") }}
+
+                                </span>
+
+                            </div>
+
+
+
+                            <!-- BAS DE CARTE -->
+
+                            <div class="ticket-card-bottom">
+
+                                <span>
+
+                                    {% if ticket.technicien %}
+
+                                        Technicien :
+                                        {{ ticket.technicien.nom }}
+
+                                    {% else %}
+
+                                        En attente d'affectation
+
+                                    {% endif %}
+
+                                </span>
+
+<a href="{{ url_for('dashboard_user', ticket=ticket.id) }}">
+    Consulter le détail →
+</a>
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+
+
+          {% else %}
+
+<div class="empty-tickets">
+    <h3>Aucun ticket pour le moment</h3>
+
+    <p>
+        Aucun ticket ne correspond au filtre sélectionné.
+    </p>
+
+    <a href="{{ url_for('creer_ticket') }}" class="empty-ticket-btn">
+        + Créer un ticket
+    </a>
+</div>
+
+{% endif %}
+
+
+            </div>
+            <!-- FIN tickets-column -->
+
+
+
+            <!-- =================================================
+                 PANNEAU DROIT
+            ================================================== -->
+
+            <aside class="ticket-detail-panel">
+
+
+                {% if selected_ticket %}
+
+
+                    <!-- HEADER -->
+
+                    <div class="detail-header">
+
+                        <span>
+                            #TK-{{ "%04d"|format(selected_ticket.id) }}
+                        </span>
+
+
+                        <div class="detail-tags">
+
+                            <span
+                                class="priority
+                                {{ selected_ticket.priorite.value|lower }}"
+                            >
+                                {{ selected_ticket.priorite.value }}
+                            </span>
+
+
+                            <span class="ticket-category">
+
+                                {% if selected_ticket.categorie %}
+                                    {{ selected_ticket.categorie.nom }}
+                                {% else %}
+                                    Sans catégorie
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- TITRE -->
+
+                    <h2>
+                        {{ selected_ticket.titre }}
+                    </h2>
+
+
+
+                    <!-- DESCRIPTION -->
+
+                    <p class="detail-description">
+                        {{ selected_ticket.description }}
+                    </p>
+
+
+
+                    <!-- =================================================
+                         CYCLE DE VIE
+                    ================================================== -->
+
+                    <div class="detail-block">
+
+                        <h3>
+                            Cycle de vie
+                        </h3>
+
+
+                        <div class="lifecycle">
+
+
+                            <!-- CREE -->
+
+                            <div class="life-step done">
+
+                                <span>✓</span>
+
+                                <small>
+                                    Créé
+                                </small>
+
+                            </div>
+
+
+                            <div
+                                class="life-line
+                                {% if selected_ticket.statut.value != 'NOUVEAU' %}
+                                    active
+                                {% endif %}"
+                            ></div>
+
+
+
+                            <!-- ASSIGNE -->
+
+                            <div
+                                class="life-step
+                                {% if selected_ticket.statut.value in
+                                ['ASSIGNE','EN_COURS','EN_ATTENTE','RESOLU','FERME'] %}
+                                    done
+                                {% endif %}"
+                            >
+
+                                <span>
+                                    2
+                                </span>
+
+                                <small>
+                                    Assigné
+                                </small>
+
+                            </div>
+
+
+                            <div
+                                class="life-line
+                                {% if selected_ticket.statut.value in
+                                ['EN_COURS','EN_ATTENTE','RESOLU','FERME'] %}
+                                    active
+                                {% endif %}"
+                            ></div>
+
+
+
+                            <!-- EN COURS -->
+
+                            <div
+                                class="life-step
+                                {% if selected_ticket.statut.value in
+                                ['EN_COURS','EN_ATTENTE'] %}
+                                    current
+                                {% elif selected_ticket.statut.value in
+                                ['RESOLU','FERME'] %}
+                                    done
+                                {% endif %}"
+                            >
+
+                                <span>
+                                    3
+                                </span>
+
+                                <small>
+                                    En cours
+                                </small>
+
+                            </div>
+
+
+                            <div
+                                class="life-line
+                                {% if selected_ticket.statut.value in
+                                ['RESOLU','FERME'] %}
+                                    active
+                                {% endif %}"
+                            ></div>
+
+
+
+                            <!-- RESOLU -->
+
+                            <div
+                                class="life-step
+                                {% if selected_ticket.statut.value == 'RESOLU' %}
+                                    current
+                                {% elif selected_ticket.statut.value == 'FERME' %}
+                                    done
+                                {% endif %}"
+                            >
+
+                                <span>
+                                    4
+                                </span>
+
+                                <small>
+                                    Résolu
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         TECHNICIEN
+                    ================================================== -->
+
+                    <div class="detail-block">
+
+                        <h3>
+                            Technicien
+                        </h3>
+
+
+                        {% if selected_ticket.technicien %}
+
+                            <div class="technician-box">
+
+                                <div class="avatar">
+                                    {{ selected_ticket.technicien.nom[0]|upper }}
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        {{ selected_ticket.technicien.nom }}
+                                    </strong>
+
+                                    <span>
+                                        Technicien support
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                        {% else %}
+
+
+                            <div class="technician-box">
+
+                                <div class="avatar">
+                                    ?
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        Non affecté
+                                    </strong>
+
+                                    <span>
+                                        En attente d'affectation
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         INFORMATIONS
+                    ================================================== -->
+
+                    <div class="detail-block">
+
+                        <h3>
+                            Informations
+                        </h3>
+
+
+                        <div class="comment">
+
+                            <strong>
+                                Statut
+                            </strong>
+
+                            <p>
+                                {{ selected_ticket.statut.value.replace("_", " ") }}
+                            </p>
+
+                        </div>
+
+
+                        <div class="comment">
+
+                            <strong>
+                                Priorité
+                            </strong>
+
+                            <p>
+                                {{ selected_ticket.priorite.value }}
+                            </p>
+
+                        </div>
+
+
+                        <div class="comment">
+
+                            <strong>
+                                Date de création
+                            </strong>
+
+                            <p>
+                                {{ selected_ticket.date_creation.strftime("%d/%m/%Y à %H:%M") }}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         COMMENTAIRE
+                         (interface seulement pour le moment)
+                    ================================================== -->
+<div class="detail-block">
+
+    <h3>
+        Derniers commentaires
+    </h3>
+
+    {% if selected_ticket.commentaires %}
+
+        {% for commentaire in selected_ticket.commentaires %}
+
+            <div class="comment">
+
+                <strong>
+                    {{ commentaire.auteur.nom }}
+                </strong>
+
+                <span>
+                    {{ commentaire.date_creation.strftime('%H:%M') }}
+                </span>
+
+                <p>
+                    {{ commentaire.contenu }}
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p class="detail-description">
+            Aucun commentaire pour le moment.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<div class="comment-form">
+
+    <form
+        method="POST"
+        action="{{ url_for('ajouter_commentaire', ticket_id=selected_ticket.id) }}"
+    >
+
+        <textarea
+            name="contenu"
+            placeholder="Ajouter un commentaire..."
+            required
+        ></textarea>
+
+        <button type="submit">
+            Envoyer
+        </button>
+
+    </form>
+
+</div>
+
+
+                {% else %}
+
+
+                    <!-- PAS DE TICKET SELECTIONNE -->
+
+                    <div class="empty-tickets">
+
+                        <h3>
+                            Aucun ticket sélectionné
+                        </h3>
+
+                        <p>
+                            Créez un ticket pour afficher ses informations.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+
+            </aside>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

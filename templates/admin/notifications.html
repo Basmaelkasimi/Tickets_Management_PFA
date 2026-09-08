@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Notifications - Administration</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body class="admin-dashboard-page">
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="user-sidebar">
+
+        <div class="user-brand">
+            <div class="brand-mark">TM</div>
+
+            <div>
+                <strong>Ticket Management</strong>
+                <span>Helpdesk</span>
+            </div>
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                ADMINISTRATION
+            </span>
+
+            <a href="{{ url_for('dashboard_admin') }}"
+               class="sidebar-item">
+                Tableau de bord
+            </a>
+
+            <a href="{{ url_for('admin_tickets') }}"
+               class="sidebar-item">
+                Tickets
+            </a>
+
+            <a href="{{ url_for('admin_historique') }}"
+               class="sidebar-item">
+                Historique
+            </a>
+
+            <a href="{{ url_for('admin_notifications') }}"
+               class="sidebar-item active">
+                Notifications
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                GESTION
+            </span>
+
+         <a href="{{ url_for('admin_utilisateurs') }}"
+   class="sidebar-item">
+    Utilisateurs
+</a>
+
+            <a href="{{ url_for('admin_techniciens') }}"
+   class="sidebar-item">
+    Techniciens
+</a>
+
+          <a href="{{ url_for('admin_categories') }}"
+   class="sidebar-item">
+    Catégories
+</a>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                COMPTE
+            </span>
+
+           <a href="{{ url_for('admin_profil') }}"
+   class="sidebar-item">
+    Profil
+</a>
+
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <span class="sidebar-user">
+                {{ current_user.nom }}
+            </span>
+
+            <span class="sidebar-role">
+                Administrateur
+            </span>
+
+            <a href="{{ url_for('logout') }}"
+               class="sidebar-item">
+                Déconnexion
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- CONTENU -->
+    <main class="user-main">
+
+        <div class="dashboard-header">
+
+            <h1>Notifications</h1>
+
+            <p>
+                Consultez les notifications liées à l'activité de la plateforme.
+            </p>
+
+        </div>
+
+
+        <section class="dashboard-card admin-notification-card">
+
+            <div class="panel-header">
+
+                <div>
+                    <h2>Toutes les notifications</h2>
+                    <p>Notifications récentes</p>
+                </div>
+
+                <span>
+                    {{ notifications|length }} notification(s)
+                </span>
+
+            </div>
+
+
+            {% if notifications %}
+
+                <div class="notification-list">
+
+                    {% for notification in notifications %}
+
+                        <div class="admin-notification-item
+                                    {% if not notification.lu %}
+                                        notification-unread
+                                    {% endif %}">
+
+                            <div class="notification-main">
+
+                                <div class="notification-top">
+
+                                    <strong>
+                                        {{ notification.message }}
+                                    </strong>
+
+                                    {% if not notification.lu %}
+                                        <span class="unread-badge">
+                                            Non lue
+                                        </span>
+                                    {% endif %}
+
+                                </div>
+
+
+                                <div class="notification-meta">
+
+                                    <span>
+                                        {{ notification.date_creation.strftime('%d/%m/%Y %H:%M') }}
+                                    </span>
+
+                                    {% if notification.ticket %}
+
+                                        <span>
+                                            Ticket #{{ notification.ticket.id }}
+                                            - {{ notification.ticket.titre }}
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            {% if not notification.lu %}
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'admin_lire_notification',
+                                        notification_id=notification.id
+                                    ) }}"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="mark-read-btn"
+                                    >
+                                        Marquer comme lue
+                                    </button>
+
+                                </form>
+
+                            {% else %}
+
+                                <span class="read-status">
+                                    Lue
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <h3>Aucune notification</h3>
+
+                    <p>
+                        Vous n'avez aucune notification pour le moment.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Utilisateurs - Administration</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body class="admin-dashboard-page">
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="user-sidebar">
+
+        <div class="user-brand">
+            <div class="brand-mark">TM</div>
+
+            <div>
+                <strong>Ticket Management</strong>
+                <span>Helpdesk</span>
+            </div>
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                ADMINISTRATION
+            </span>
+
+            <a href="{{ url_for('dashboard_admin') }}"
+               class="sidebar-item">
+                Tableau de bord
+            </a>
+
+            <a href="{{ url_for('admin_tickets') }}"
+               class="sidebar-item">
+                Tickets
+            </a>
+
+            <a href="{{ url_for('admin_historique') }}"
+               class="sidebar-item">
+                Historique
+            </a>
+
+            <a href="{{ url_for('admin_notifications') }}"
+               class="sidebar-item">
+                Notifications
+            </a>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                GESTION
+            </span>
+
+            <a href="{{ url_for('admin_utilisateurs') }}"
+               class="sidebar-item active">
+                Utilisateurs
+            </a>
+
+<a href="{{ url_for('admin_techniciens') }}"
+   class="sidebar-item">
+    Techniciens
+</a>
+
+          <a href="{{ url_for('admin_categories') }}"
+   class="sidebar-item">
+    Catégories
+</a>
+
+        </div>
+
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                COMPTE
+            </span>
+
+            <a href="{{ url_for('admin_profil') }}"
+   class="sidebar-item">
+    Profil
+</a>
+
+        </div>
+
+
+        <div class="sidebar-bottom">
+
+            <span class="sidebar-user">
+                {{ current_user.nom }}
+            </span>
+
+            <span class="sidebar-role">
+                Administrateur
+            </span>
+
+            <a href="{{ url_for('logout') }}"
+               class="sidebar-item">
+                Déconnexion
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- CONTENU -->
+    <main class="user-main">
+
+        <div class="dashboard-header">
+
+            <h1>Utilisateurs</h1>
+
+            <p>
+                Consultez les comptes enregistrés sur la plateforme.
+            </p>
+
+        </div>
+
+
+        <section class="dashboard-card admin-users-card">
+
+            <div class="panel-header">
+
+                <div>
+                    <h2>Liste des utilisateurs</h2>
+                    <p>Comptes de la plateforme</p>
+                </div>
+
+                <span>
+                    {{ utilisateurs|length }} utilisateur(s)
+                </span>
+
+            </div>
+
+
+            {% if utilisateurs %}
+
+                <div class="admin-users-list">
+
+                    {% for utilisateur in utilisateurs %}
+
+                        <div class="admin-user-item">
+
+                            <div class="admin-user-main">
+
+                                <div class="admin-user-avatar">
+                                    {{ utilisateur.nom[0]|upper }}
+                                </div>
+
+                                <div class="admin-user-info">
+
+                                    <strong>
+                                        {{ utilisateur.nom }}
+                                    </strong>
+
+                                    <span>
+                                        {{ utilisateur.email }}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="admin-user-role">
+
+                                <span class="role-badge role-{{ utilisateur.role.value|lower }}">
+                                    {{ utilisateur.role.value }}
+                                </span>
+
+                            </div>
+
+
+                            <div class="admin-user-date">
+
+                                <span>
+                                    Créé le
+                                </span>
+
+                                <strong>
+                                    {{ utilisateur.date_creation.strftime('%d/%m/%Y') }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <h3>Aucun utilisateur</h3>
+
+                    <p>
+                        Aucun compte n'est enregistré.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

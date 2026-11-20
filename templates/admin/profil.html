@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Profil - Administration</title>
+    <title>Mon profil - Administration</title>
 
     <link
         rel="stylesheet"
@@ -13,11 +13,13 @@
     >
 </head>
 
-<body class="admin-dashboard-page">
+<body class="admin-dashboard-page admin-page">
 
 <div class="app-shell">
 
-    <!-- SIDEBAR -->
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
     <aside class="user-sidebar">
 
         <div class="user-brand">
@@ -40,31 +42,23 @@
                 ADMINISTRATION
             </span>
 
-            <a
-                href="{{ url_for('dashboard_admin') }}"
-                class="sidebar-item"
-            >
+            <a href="{{ url_for('dashboard_admin') }}"
+               class="sidebar-item">
                 Tableau de bord
             </a>
 
-            <a
-                href="{{ url_for('admin_tickets') }}"
-                class="sidebar-item"
-            >
+            <a href="{{ url_for('admin_tickets') }}"
+               class="sidebar-item">
                 Tickets
             </a>
 
-            <a
-                href="{{ url_for('admin_historique') }}"
-                class="sidebar-item"
-            >
+            <a href="{{ url_for('admin_historique') }}"
+               class="sidebar-item">
                 Historique
             </a>
 
-            <a
-                href="{{ url_for('admin_notifications') }}"
-                class="sidebar-item"
-            >
+            <a href="{{ url_for('admin_notifications') }}"
+               class="sidebar-item">
                 Notifications
             </a>
 
@@ -77,25 +71,24 @@
                 GESTION
             </span>
 
-            <a
-                href="{{ url_for('admin_utilisateurs') }}"
-                class="sidebar-item"
-            >
+            <a href="{{ url_for('admin_utilisateurs') }}"
+               class="sidebar-item">
                 Utilisateurs
             </a>
 
-            <a
-                href="{{ url_for('admin_techniciens') }}"
-                class="sidebar-item"
-            >
+            <a href="{{ url_for('admin_techniciens') }}"
+               class="sidebar-item">
                 Techniciens
             </a>
 
-            <a
-                href="{{ url_for('admin_categories') }}"
-                class="sidebar-item"
-            >
+            <a href="{{ url_for('admin_categories') }}"
+               class="sidebar-item">
                 Catégories
+            </a>
+
+            <a href="{{ url_for('admin_statistiques') }}"
+               class="sidebar-item">
+                Statistiques
             </a>
 
         </div>
@@ -107,10 +100,8 @@
                 COMPTE
             </span>
 
-            <a
-                href="{{ url_for('admin_profil') }}"
-                class="sidebar-item active"
-            >
+            <a href="{{ url_for('admin_profil') }}"
+               class="sidebar-item active">
                 Profil
             </a>
 
@@ -127,10 +118,8 @@
                 Administrateur
             </span>
 
-            <a
-                href="{{ url_for('logout') }}"
-                class="sidebar-item"
-            >
+            <a href="{{ url_for('logout') }}"
+               class="sidebar-item">
                 Déconnexion
             </a>
 
@@ -139,220 +128,297 @@
     </aside>
 
 
-    <!-- CONTENU -->
-    <main class="user-main">
+    <!-- =====================================================
+         CONTENU
+    ====================================================== -->
+    <main class="user-main admin-profile-page">
 
-        <div class="dashboard-header">
+       <div class="admin-page-header">
 
-            <div>
+    <div>
 
-                <h1>Profil</h1>
+        <h1>Profil</h1>
 
-                <p>
-                    Consultez et modifiez vos informations personnelles.
-                </p>
+        <div class="admin-title-line"></div>
 
-            </div>
+        <p>
+            Consultez et modifiez vos informations personnelles.
+        </p>
 
-        </div>
+    </div>
+
+</div>
 
 
-        <!-- MESSAGES FLASH -->
+        <!-- MESSAGES -->
         {% with messages = get_flashed_messages() %}
 
             {% if messages %}
 
-                <div class="flash-container">
+                {% for message in messages %}
 
-                    {% for message in messages %}
+                    <div class="admin-profile-success">
+                        {{ message }}
+                    </div>
 
-                        <div class="flash-message">
-                            {{ message }}
-                        </div>
-
-                    {% endfor %}
-
-                </div>
+                {% endfor %}
 
             {% endif %}
 
         {% endwith %}
 
 
-        <!-- CARTE PROFIL -->
-        <section class="dashboard-card admin-profile-card">
+        <!-- =================================================
+             LAYOUT PROFIL
+        ================================================== -->
+        <div class="admin-profile-layout">
 
-            <!-- HEADER PROFIL -->
-            <div class="profile-header">
 
-                <div class="profile-avatar">
+            <!-- =============================================
+                 CARTE GAUCHE
+            ============================================== -->
+            <aside class="admin-profile-summary">
+
+                <div class="admin-profile-avatar">
                     {{ current_user.nom[0]|upper }}
                 </div>
 
-                <div>
+                <h2>
+                    {{ current_user.nom }}
+                </h2>
+
+                <p class="admin-profile-email">
+                    {{ current_user.email }}
+                </p>
+
+                <span class="admin-profile-role">
+                    Administrateur
+                </span>
+
+
+                <div class="admin-profile-separator"></div>
+
+
+                <div class="admin-profile-detail">
+
+                    <div class="admin-status-dot"></div>
+
+                    <div>
+                        <span>Compte</span>
+                        <strong class="admin-account-active">
+                            Actif
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="admin-profile-detail">
+
+                    <div class="admin-date-icon">
+                        ▣
+                    </div>
+
+                    <div>
+                        <span>Membre depuis</span>
+
+                        <strong>
+                            {{ current_user.date_creation.strftime('%d/%m/%Y') }}
+                        </strong>
+                    </div>
+
+                </div>
+
+            </aside>
+
+
+            <!-- =============================================
+                 CARTE DROITE
+            ============================================== -->
+            <section class="admin-profile-settings">
+
+                <div class="admin-settings-header">
+
+                    <span>
+                        PARAMÈTRES DU COMPTE
+                    </span>
 
                     <h2>
-                        {{ current_user.nom }}
+                        Informations personnelles
                     </h2>
 
-                    <span>
-                        Administrateur
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <!-- FORMULAIRE -->
-            <form
-                method="POST"
-                action="{{ url_for('admin_profil') }}"
-                class="admin-profile-form"
-            >
-
-                <!-- NOM -->
-                <div class="form-group">
-
-                    <label for="nom">
-                        Nom
-                    </label>
-
-                    <input
-                        type="text"
-                        id="nom"
-                        name="nom"
-                        value="{{ current_user.nom }}"
-                        required
-                    >
+                    <p>
+                        Gérez les informations associées à votre compte administrateur.
+                    </p>
 
                 </div>
 
 
-                <!-- EMAIL -->
-                <div class="form-group">
-
-                    <label for="email">
-                        Email
-                    </label>
-
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value="{{ current_user.email }}"
-                        required
-                    >
-
-                </div>
+                <form
+                    method="POST"
+                    action="{{ url_for('admin_profil') }}"
+                    class="admin-modern-profile-form"
+                >
 
 
-                <!-- ROLE -->
-                <div class="profile-info-row">
-
-                    <span>
-                        Rôle
-                    </span>
-
-                    <strong>
-                        {{ current_user.role.value }}
-                    </strong>
-
-                </div>
+                    <!-- NOM + ROLE -->
+                    <div class="admin-profile-form-row">
 
 
-                <!-- DATE CREATION -->
-                <div class="profile-info-row">
+                        <div class="admin-modern-field">
 
-                    <span>
-                        Compte créé le
-                    </span>
+                            <label for="nom">
+                                Nom complet
+                            </label>
 
-                    <strong>
-                        {{ current_user.date_creation.strftime('%d/%m/%Y') }}
-                    </strong>
+                            <input
+                                id="nom"
+                                type="text"
+                                name="nom"
+                                value="{{ current_user.nom }}"
+                                required
+                            >
 
-                </div>
+                        </div>
 
 
-                <!-- MOT DE PASSE -->
-                <div class="password-section">
+                        <div class="admin-modern-field">
 
-                    <div class="password-section-title">
+                            <label>
+                                Rôle
+                            </label>
 
-                        <h3>
-                            Modifier le mot de passe
-                        </h3>
+                            <input
+                                type="text"
+                                value="Administrateur"
+                                disabled
+                            >
 
-                        <p>
-                            Laissez ces champs vides si vous ne souhaitez pas
-                            modifier votre mot de passe.
-                        </p>
+                        </div>
 
                     </div>
 
 
-                    <!-- ANCIEN -->
-                    <div class="form-group">
+                    <!-- EMAIL -->
+                    <div class="admin-modern-field">
 
-                        <label for="ancien_mot_de_passe">
-                            Mot de passe actuel
+                        <label for="email">
+                            Adresse email
                         </label>
 
                         <input
-                            type="password"
-                            id="ancien_mot_de_passe"
-                            name="ancien_mot_de_passe"
-                            placeholder="Votre mot de passe actuel"
+                            id="email"
+                            type="email"
+                            name="email"
+                            value="{{ current_user.email }}"
+                            required
                         >
 
                     </div>
 
 
-                    <!-- NOUVEAU -->
-                    <div class="form-group">
+                    <!-- =====================================
+                         SÉCURITÉ
+                    ====================================== -->
+                    <div class="admin-security-section">
 
-                        <label for="nouveau_mot_de_passe">
-                            Nouveau mot de passe
-                        </label>
+                        <div class="admin-security-heading">
 
-                        <input
-                            type="password"
-                            id="nouveau_mot_de_passe"
-                            name="nouveau_mot_de_passe"
-                            placeholder="Minimum 6 caractères"
-                        >
+                            <span>
+                                SÉCURITÉ
+                            </span>
+
+                            <h3>
+                                Mot de passe
+                            </h3>
+
+                            <p>
+                                Modifiez votre mot de passe uniquement si nécessaire.
+                            </p>
+
+                        </div>
+
+
+                        <div class="admin-modern-field">
+
+                            <label for="ancien_mot_de_passe">
+                                Mot de passe actuel
+                            </label>
+
+                            <input
+                                id="ancien_mot_de_passe"
+                                type="password"
+                                name="ancien_mot_de_passe"
+                                placeholder="Votre mot de passe actuel"
+                            >
+
+                        </div>
+
+
+                        <div class="admin-profile-form-row">
+
+                            <div class="admin-modern-field">
+
+                                <label for="nouveau_mot_de_passe">
+                                    Nouveau mot de passe
+                                </label>
+
+                                <input
+                                    id="nouveau_mot_de_passe"
+                                    type="password"
+                                    name="nouveau_mot_de_passe"
+                                    placeholder="Minimum 6 caractères"
+                                >
+
+                            </div>
+
+
+                            <div class="admin-modern-field">
+
+                                <label for="confirmation_mot_de_passe">
+                                    Confirmer le mot de passe
+                                </label>
+
+                                <input
+                                    id="confirmation_mot_de_passe"
+                                    type="password"
+                                    name="confirmation_mot_de_passe"
+                                    placeholder="Confirmez le mot de passe"
+                                >
+
+                            </div>
+
+                        </div>
 
                     </div>
 
 
-                    <!-- CONFIRMATION -->
-                    <div class="form-group">
+                    <!-- =====================================
+                         ACTIONS
+                    ====================================== -->
+                    <div class="admin-profile-actions">
 
-                        <label for="confirmation_mot_de_passe">
-                            Confirmer le nouveau mot de passe
-                        </label>
-
-                        <input
-                            type="password"
-                            id="confirmation_mot_de_passe"
-                            name="confirmation_mot_de_passe"
-                            placeholder="Confirmez le nouveau mot de passe"
+                        <a
+                            href="{{ url_for('dashboard_admin') }}"
+                            class="admin-profile-cancel"
                         >
+                            Annuler
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="admin-profile-save"
+                        >
+                            Enregistrer les modifications
+                        </button>
 
                     </div>
 
-                </div>
+                </form>
 
+            </section>
 
-                <!-- BOUTON -->
-                <button type="submit">
-                    Enregistrer les modifications
-                </button>
-
-            </form>
-
-        </section>
+        </div>
 
     </main>
 

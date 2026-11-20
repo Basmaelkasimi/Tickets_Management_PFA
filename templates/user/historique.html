@@ -14,8 +14,7 @@
 </head>
 
 
-<body class="user-dashboard-page">
-
+<body class="user-dashboard-page user-page">
 <div class="app-shell">
 
     <!-- SIDEBAR -->
@@ -48,13 +47,10 @@
             >
                 Tableau de bord
             </a>
-
-            <a
-                href="{{ url_for('dashboard_user') }}"
-                class="sidebar-item"
-            >
-                Mes tickets
-            </a>
+<a href="{{ url_for('tickets_user') }}"
+   class="sidebar-item">
+    Mes tickets
+</a>
 
             <a
                 href="{{ url_for('creer_ticket') }}"
@@ -252,11 +248,12 @@
                                         {{ historique.action }}
                                     </strong>
 
-                                    <span class="history-ticket">
-
-                                        #TK-{{ "%04d"|format(historique.ticket.id) }}
-
-                                    </span>
+<a
+    href="{{ url_for('dashboard_user', ticket=historique.ticket.id) }}"
+    class="history-ticket"
+>
+    #TK-{{ "%04d"|format(historique.ticket.id) }}
+</a>
 
                                 </div>
 
@@ -289,6 +286,23 @@
                                 {% endif %}
 
                             </p>
+
+
+                            {% if historique.ticket.solution_resolution %}
+
+    <div class="ticket-solution-user">
+
+        <strong>
+            Solution appliquée
+        </strong>
+
+        <p>
+            {{ historique.ticket.solution_resolution }}
+        </p>
+
+    </div>
+
+{% endif %}
 
                         </div>
 

@@ -13,94 +13,109 @@
     >
 </head>
 
-<body class="user-dashboard-page">
 
+<body class="user-dashboard-page user-page">
 <div class="app-shell">
 
     <!-- SIDEBAR -->
+<aside class="user-sidebar">
 
-    <aside class="user-sidebar">
+    <div class="user-brand">
+        <div class="brand-mark">TM</div>
 
-        <div class="user-brand">
-
-            <div class="brand-mark">
-                TM
-            </div>
-
-            <div>
-                <strong>Ticket Management</strong>
-                <span>Helpdesk</span>
-            </div>
-
+        <div>
+            <strong>Ticket Management</strong>
+            <span>Helpdesk</span>
         </div>
+    </div>
 
-        <div class="sidebar-section">
+    <div class="sidebar-section">
 
-            <span class="sidebar-title">
-                ESPACE UTILISATEUR
-            </span>
+        <span class="sidebar-title">
+            ESPACE UTILISATEUR
+        </span>
 
-            <a
-                href="{{ url_for('dashboard_user') }}"
-                class="sidebar-item"
-            >
-                Tableau de bord
-            </a>
+        <a href="{{ url_for('dashboard_user') }}"
+           class="sidebar-item">
+            Tableau de bord
+        </a>
 
-            <a href="#" class="sidebar-item">
-                Mes tickets
-            </a>
+       <a href="{{ url_for('tickets_user') }}"
+   class="sidebar-item">
+    Mes tickets
+</a>
 
-            <a
-                href="{{ url_for('creer_ticket') }}"
-                class="sidebar-item active"
-            >
-                Nouveau ticket
-            </a>
+        <a href="{{ url_for('creer_ticket') }}"
+           class="sidebar-item active">
+            Nouveau ticket
+        </a>
 
-        </div>
+    </div>
 
-        <div class="sidebar-section">
+    <div class="sidebar-section">
 
-            <span class="sidebar-title">
-                COMPTE
-            </span>
+        <span class="sidebar-title">
+            SUIVI
+        </span>
 
-            <a href="#" class="sidebar-item">
-                Notifications
-            </a>
+        <a href="{{ url_for('dashboard_user', statut='EN_COURS') }}"
+           class="sidebar-item">
+            En cours
+        </a>
 
-            <a href="#" class="sidebar-item">
-                Mon profil
-            </a>
+        <a href="{{ url_for('dashboard_user', statut='EN_ATTENTE') }}"
+           class="sidebar-item">
+            En attente
+        </a>
 
-        </div>
+        <a href="{{ url_for('dashboard_user', statut='RESOLU') }}"
+           class="sidebar-item">
+            Résolus
+        </a>
 
-        <div class="sidebar-bottom">
+        <a href="{{ url_for('historique_user') }}"
+           class="sidebar-item">
+            Historique
+        </a>
 
-            <div class="sidebar-user">
+    </div>
 
-                <div class="avatar">
-                    {{ current_user.nom[0] }}
-                </div>
+    <div class="sidebar-section">
 
-                <div>
-                    <strong>{{ current_user.nom }}</strong>
-                    <span>Utilisateur</span>
-                </div>
+        <span class="sidebar-title">
+            COMPTE
+        </span>
 
-            </div>
+        <a href="{{ url_for('notifications_user') }}"
+           class="sidebar-item">
+            Notifications
+        </a>
 
-            <a
-                href="{{ url_for('logout') }}"
-                class="sidebar-logout"
-            >
-                Se déconnecter
-            </a>
+        <a href="{{ url_for('profil_user') }}"
+           class="sidebar-item">
+            Mon profil
+        </a>
 
-        </div>
+    </div>
 
-    </aside>
+    <div class="sidebar-bottom">
+
+        <span class="sidebar-user">
+            {{ current_user.nom }}
+        </span>
+
+        <span class="sidebar-role">
+            Utilisateur
+        </span>
+
+        <a href="{{ url_for('logout') }}"
+           class="sidebar-item">
+            Déconnexion
+        </a>
+
+    </div>
+
+</aside>
 
 
     <!-- CONTENT -->
@@ -137,21 +152,6 @@
             </div>
 
 
-            {% with messages = get_flashed_messages() %}
-
-                {% if messages %}
-
-                    <div class="alert">
-
-                        {% for message in messages %}
-                            <p>{{ message }}</p>
-                        {% endfor %}
-
-                    </div>
-
-                {% endif %}
-
-            {% endwith %}
 
 
             <form
@@ -216,15 +216,36 @@
                                 Sélectionner une catégorie
                             </option>
 
-                            {% for categorie in categories %}
+                           {% for categorie in categories %}
 
-                                <option value="{{ categorie.id }}">
-                                    {{ categorie.nom }}
-                                </option>
+    <option
+        value="{{ categorie.id }}"
+        data-nom="{{ categorie.nom|lower }}"
+    >
+        {{ categorie.nom }}
+    </option>
 
-                            {% endfor %}
+{% endfor %}
 
                         </select>
+
+                        <div id="autre-categorie-container" style="display: none; margin-top: 12px;">
+
+    <label for="autre_categorie">
+        Précisez la catégorie *
+    </label>
+
+    <input
+        type="text"
+        id="autre_categorie"
+        name="autre_categorie"
+        placeholder="Précisez votre catégorie"
+        maxlength="100"
+    >
+
+</div>
+
+
 
                     </div>
 
@@ -265,7 +286,31 @@
 
                     </div>
 
+
+ <div class="form-group">
+    <label for="localisation">Localisation *</label>
+    <input
+        type="text"
+        id="localisation"
+        name="localisation"
+        placeholder="Ex : Bâtiment A - 2ème étage - Bureau 205"
+        required
+    >
+</div>
+
+<div class="form-group">
+    <label for="equipement">Équipement concerné</label>
+    <input
+        type="text"
+        id="equipement"
+        name="equipement"
+        placeholder="Ex : PC-023, Imprimante-04..."
+    >
+</div>
+
                 </div>
+
+
 
 
                 <div class="form-info-box">
@@ -307,6 +352,47 @@
     </main>
 
 </div>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const categorieSelect =
+        document.getElementById("categorie_id");
+
+    const autreContainer =
+        document.getElementById("autre-categorie-container");
+
+    const autreInput =
+        document.getElementById("autre_categorie");
+
+
+    categorieSelect.addEventListener("change", function () {
+
+        const option =
+            this.options[this.selectedIndex];
+
+        const nom =
+            option.getAttribute("data-nom") || "";
+
+        if (nom.trim().toLowerCase() === "autre") {
+
+            autreContainer.style.display = "block";
+            autreInput.required = true;
+
+        } else {
+
+            autreContainer.style.display = "none";
+            autreInput.required = false;
+            autreInput.value = "";
+
+        }
+
+    });
+
+});
+</script>
 
 </body>
 </html>

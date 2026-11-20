@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Notifications Technicien - Ticket Management</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body class="technician-page">
+
+<div class="app-shell">
+
+    <aside class="user-sidebar">
+
+        <div class="user-brand">
+
+            <div class="brand-mark">
+                TM
+            </div>
+
+            <div>
+                <strong>Ticket Management</strong>
+                <span>Helpdesk</span>
+            </div>
+
+        </div>
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                ESPACE TECHNICIEN
+            </span>
+
+            <a href="{{ url_for('dashboard_technicien') }}"
+               class="sidebar-item">
+                Tableau de bord
+            </a>
+
+           <a href="{{ url_for('tickets_technicien') }}"
+   class="sidebar-item">
+    Mes tickets
+</a>
+
+            <a href="{{ url_for('historique_technicien') }}"
+               class="sidebar-item">
+                Historique
+            </a>
+
+            <a href="{{ url_for('notifications_technicien') }}"
+               class="sidebar-item active">
+                Notifications
+            </a>
+
+                  <a href="{{ url_for('profil_technicien') }}"
+   class="sidebar-item">
+    Mon profil
+</a>
+
+
+        </div>
+
+        <div class="sidebar-bottom">
+
+            <span class="sidebar-user">
+                {{ current_user.nom }}
+            </span>
+
+            <span class="sidebar-role">
+                Technicien
+            </span>
+
+            <a href="{{ url_for('logout') }}"
+               class="sidebar-item">
+                Déconnexion
+            </a>
+
+        </div>
+
+    </aside>
+
+    <main class="user-main">
+
+        <div class="dashboard-header">
+
+            <div>
+
+                <span class="profile-small-label">
+                    ALERTES
+                </span>
+
+                <h1>
+                    Notifications
+                </h1>
+                <div class="technician-title-line"></div>
+
+                <p>
+                    Consultez les nouvelles affectations et mises à jour de vos tickets.
+                </p>
+
+            </div>
+
+        </div>
+
+        <section class="notifications-section">
+
+            {% if notifications %}
+
+                {% for notification in notifications %}
+
+                    <div class="notification-item {% if not notification.lu %}unread{% endif %}">
+
+                        <div class="notification-content">
+
+                            <strong>
+                                {% if notification.ticket %}
+                                    Ticket #{{ notification.ticket.id }}
+                                {% else %}
+                                    Notification
+                                {% endif %}
+                            </strong>
+
+                            <p>
+                                {{ notification.message }}
+                            </p>
+
+                            <span>
+                                {{ notification.date_creation.strftime('%d/%m/%Y %H:%M') }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <h3>
+                        Aucune notification
+                    </h3>
+
+                    <p>
+                        Vous n'avez aucune notification pour le moment.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

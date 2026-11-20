@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Historique des incidents - Ticket Management</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body class="technician-page">
+
+<div class="app-shell">
+
+    <aside class="user-sidebar">
+
+        <div class="user-brand">
+
+            <div class="brand-mark">TM</div>
+
+            <div>
+                <strong>Ticket Management</strong>
+                <span>Helpdesk</span>
+            </div>
+
+        </div>
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                ESPACE TECHNICIEN
+            </span>
+
+            <a href="{{ url_for('dashboard_technicien') }}"
+               class="sidebar-item">
+                Tableau de bord
+            </a>
+
+            <a href="{{ url_for('tickets_technicien') }}"
+               class="sidebar-item">
+                Mes tickets
+            </a>
+
+            <a href="{{ url_for('historique_technicien') }}"
+               class="sidebar-item active">
+                Historique des incidents
+            </a>
+
+            <a href="{{ url_for('notifications_technicien') }}"
+               class="sidebar-item">
+                Notifications
+            </a>
+
+            <a href="{{ url_for('profil_technicien') }}"
+               class="sidebar-item">
+                Mon profil
+            </a>
+
+        </div>
+
+        <div class="sidebar-bottom">
+
+            <span class="sidebar-user">
+                {{ current_user.nom }}
+            </span>
+
+            <span class="sidebar-role">
+                Technicien
+            </span>
+
+            <a href="{{ url_for('logout') }}"
+               class="sidebar-item">
+                Déconnexion
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <main class="user-main">
+
+        <div class="dashboard-header">
+
+            <div>
+
+                <span class="profile-small-label">
+                    BASE DES INCIDENTS
+                </span>
+
+                <h1>
+                    Historique des incidents
+                </h1>
+                <div class="technician-title-line"></div>
+
+                <p>
+                    Recherchez des incidents déjà traités afin de retrouver
+                    les solutions appliquées précédemment.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- RECHERCHE -->
+        <section class="ticket-toolbar">
+
+            <form
+                method="GET"
+                action="{{ url_for('historique_technicien') }}"
+                class="ticket-filter-form"
+            >
+
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ request.args.get('q', '') }}"
+                    placeholder="Ex : Wi-Fi, imprimante, connexion..."
+                >
+
+                <select name="categorie">
+
+                    <option value="">
+                        Toutes les catégories
+                    </option>
+
+                    {% for categorie in categories %}
+
+                        <option
+                            value="{{ categorie.id }}"
+                            {% if request.args.get('categorie')|int == categorie.id %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ categorie.nom }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <button type="submit">
+                    Rechercher
+                </button>
+
+                {% if request.args.get('q') or request.args.get('categorie') %}
+
+                    <a
+                        href="{{ url_for('historique_technicien') }}"
+                        class="filter-reset"
+                    >
+                        Réinitialiser
+                    </a>
+
+                {% endif %}
+
+            </form>
+
+        </section>
+
+
+        <!-- INCIDENTS -->
+        <section class="ticket-list-panel">
+
+            <div class="panel-header">
+
+                <h2>
+                    Incidents déjà traités
+                </h2>
+
+                <span>
+                    {{ incidents|length }} résultat(s)
+                </span>
+
+            </div>
+
+
+            {% if incidents %}
+
+                {% for ticket in incidents %}
+
+                    <div class="ticket-list-item">
+
+                        <div class="ticket-list-content">
+
+                          <a
+    href="{{ url_for('dashboard_technicien', ticket=ticket.id) }}"
+    class="history-ticket"
+>
+    #TK-{{ "%04d"|format(ticket.id) }}
+    — {{ ticket.titre }}
+</a>
+
+                            <span>
+                                {{ ticket.categorie.nom }}
+                            </span>
+
+                            <p>
+                                {{ ticket.description }}
+                            </p>
+
+                            <small>
+                                Résolu
+                                {% if ticket.date_resolution %}
+                                    le {{ ticket.date_resolution.strftime('%d/%m/%Y %H:%M') }}
+                                {% endif %}
+                            </small>
+
+                            {% if ticket.technicien %}
+
+                                <small>
+                                    Traité par : {{ ticket.technicien.nom }}
+                                </small>
+
+                            {% endif %}
+
+
+                            <!-- SOLUTION / ECHANGES -->
+                         <!-- SOLUTION APPLIQUEE -->
+
+<div class="incident-solution">
+
+    <strong>
+        Solution appliquée
+    </strong>
+
+    {% if ticket.solution_resolution %}
+
+        <p>
+            {{ ticket.solution_resolution }}
+        </p>
+
+    {% else %}
+
+        <p>
+            Aucune solution détaillée n'a été enregistrée.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<!-- ECHANGES -->
+
+{% if ticket.commentaires %}
+
+    <div class="incident-solution">
+
+        <strong>
+            Échanges avec le demandeur
+        </strong>
+
+        {% for commentaire in ticket.commentaires %}
+
+            <div class="incident-comment">
+
+                <span>
+                    {{ commentaire.auteur.nom }}
+                </span>
+
+                <p>
+                    {{ commentaire.contenu }}
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+{% endif %}
+
+                        </div>
+
+
+                        <div class="ticket-list-meta">
+
+                            <span class="ticket-priority">
+                                {{ ticket.priorite.value }}
+                            </span>
+
+                            <span
+                                class="ticket-status status-{{ ticket.statut.value|lower }}"
+                            >
+                                {{ ticket.statut.value.replace('_', ' ') }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <h3>
+                        Aucun incident similaire trouvé
+                    </h3>
+
+                    <p>
+                        Essayez un autre mot-clé ou une autre catégorie.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

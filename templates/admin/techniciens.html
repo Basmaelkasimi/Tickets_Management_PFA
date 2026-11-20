@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Techniciens - Administration</title>
+    <title>Gestion des techniciens</title>
 
     <link
         rel="stylesheet"
@@ -13,19 +13,21 @@
     >
 </head>
 
-<body class="admin-dashboard-page">
-
+<body class="admin-dashboard-page admin-page">
 <div class="app-shell">
 
+    <!-- ================= SIDEBAR ================= -->
     <aside class="user-sidebar">
 
         <div class="user-brand">
+
             <div class="brand-mark">TM</div>
 
             <div>
                 <strong>Ticket Management</strong>
                 <span>Helpdesk</span>
             </div>
+
         </div>
 
 
@@ -74,9 +76,14 @@
                 Techniciens
             </a>
 
-           <a href="{{ url_for('admin_categories') }}"
+            <a href="{{ url_for('admin_categories') }}"
+               class="sidebar-item">
+                Catégories
+            </a>
+
+                        <a href="{{ url_for('admin_statistiques') }}"
    class="sidebar-item">
-    Catégories
+    Statistiques
 </a>
 
         </div>
@@ -88,10 +95,11 @@
                 COMPTE
             </span>
 
-          <a href="{{ url_for('admin_profil') }}"
-   class="sidebar-item">
-    Profil
-</a>
+            <a href="{{ url_for('admin_profil') }}"
+               class="sidebar-item">
+                Profil
+            </a>
+
         </div>
 
 
@@ -115,27 +123,80 @@
     </aside>
 
 
-    <main class="user-main">
+    <!-- ================= MAIN ================= -->
+    <main class="user-main admin-technicians-page">
 
-        <div class="dashboard-header">
 
-            <h1>Techniciens</h1>
+        <!-- HEADER -->
+        <div class="technicians-page-header">
 
-            <p>
-                Consultez les techniciens et leurs tickets assignés.
-            </p>
+            <div>
+
+                <h1>
+                    Gestion des techniciens
+                </h1>
+
+                <div class="title-line"></div>
+
+                <p>
+                    Consultez les techniciens et leurs tickets assignés.
+                </p>
+
+            </div>
 
         </div>
 
 
-        <section class="dashboard-card admin-technicians-card">
+        <!-- ================= RECHERCHE ================= -->
 
-            <div class="panel-header">
+<section class="users-search-section">
 
-                <div>
-                    <h2>Liste des techniciens</h2>
-                    <p>Techniciens enregistrés sur la plateforme</p>
-                </div>
+    <form
+        method="GET"
+        action="{{ url_for('admin_techniciens') }}"
+        class="users-search-form"
+    >
+
+        <div class="users-search-wrapper">
+
+            <input
+                type="text"
+                name="q"
+                value="{{ recherche or '' }}"
+                placeholder="Rechercher un technicien par nom ou email..."
+            >
+
+            <button type="submit" aria-label="Rechercher">
+
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 0 0 0-13ZM2 10.5a8.5 8.5 0 1 1 15.3 5.1l4.05 4.05a1 1 0 0 1-1.42 1.42l-4.04-4.05A8.5 8.5 0 0 1 2 10.5Z"/>
+                </svg>
+
+            </button>
+
+        </div>
+
+        {% if recherche %}
+            <a
+                href="{{ url_for('admin_techniciens') }}"
+                class="users-search-reset"
+            >
+                Réinitialiser
+            </a>
+        {% endif %}
+
+    </form>
+
+</section>
+
+        <!-- ================= TABLE ================= -->
+        <section class="technicians-table-card">
+
+            <div class="technicians-table-header">
+
+                <h2>
+                    Liste des techniciens
+                </h2>
 
                 <span>
                     {{ techniciens|length }} technicien(s)
@@ -146,92 +207,113 @@
 
             {% if techniciens %}
 
-                <div class="admin-technicians-list">
+                <div class="technicians-table-wrapper">
 
-                    {% for technicien in techniciens %}
+                    <table class="technicians-table">
 
-                        <div class="admin-technician-item">
+                        <thead>
 
-                            <div class="admin-technician-main">
+                            <tr>
+                                <th>Technicien</th>
+                                <th>Email</th>
+                                <th>Tickets assignés</th>
+                                <th>En cours</th>
+                                <th>Résolus</th>
+                            </tr>
 
-                                <div class="admin-user-avatar">
-                                    {{ technicien.nom[0]|upper }}
-                                </div>
+                        </thead>
 
-                                <div class="admin-user-info">
 
-                                    <strong>
-                                        {{ technicien.nom }}
-                                    </strong>
+                        <tbody>
 
-                                    <span>
+                            {% for technicien in techniciens %}
+
+                                <tr>
+
+                                    <!-- TECHNICIEN -->
+                                    <td>
+
+                                        <div class="technician-profile">
+
+                                            <div class="technician-avatar">
+                                                {{ technicien.nom[0]|upper }}
+                                            </div>
+
+                                            <strong>
+                                                {{ technicien.nom }}
+                                            </strong>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <!-- EMAIL -->
+                                    <td>
                                         {{ technicien.email }}
-                                    </span>
-
-                                </div>
-
-                            </div>
+                                    </td>
 
 
-                            <div class="technician-stat">
+                                    <!-- ASSIGNES -->
+                                    <td>
 
-                                <span>
-                                    Tickets assignés
-                                </span>
+                                        <span class="technician-count total">
 
-                                <strong>
-                                    {{ technicien.tickets_assignes|length }}
-                                </strong>
+                                            {{ technicien.tickets_assignes|length }}
 
-                            </div>
+                                        </span>
 
-
-                            <div class="technician-stat">
-
-                                <span>
-                                    En cours
-                                </span>
-
-                                <strong>
-                                    {{
-                                        technicien.tickets_assignes
-                                        |selectattr(
-                                            "statut",
-                                            "equalto",
-                                            StatutTicket.EN_COURS
-                                        )
-                                        |list
-                                        |length
-                                    }}
-                                </strong>
-
-                            </div>
+                                    </td>
 
 
-                            <div class="technician-stat">
+                                    <!-- EN COURS -->
+                                    <td>
 
-                                <span>
-                                    Résolus
-                                </span>
+                                        <span class="technician-count progress">
 
-                                <strong>
-                                    {{
-                                        technicien.tickets_assignes
-                                        |selectattr(
-                                            "statut",
-                                            "equalto",
-                                            StatutTicket.RESOLU
-                                        )
-                                        |list
-                                        |length
-                                    }}
-                                </strong>
+                                            {{
+                                                technicien.tickets_assignes
+                                                |selectattr(
+                                                    "statut",
+                                                    "equalto",
+                                                    StatutTicket.EN_COURS
+                                                )
+                                                |list
+                                                |length
+                                            }}
 
-                            </div>
+                                        </span>
 
-                        </div>
+                                    </td>
 
-                    {% endfor %}
+
+                                    <!-- RESOLUS -->
+                                    <td>
+
+                                        <span class="technician-count resolved">
+
+                                            {{
+                                                technicien.tickets_assignes
+                                                |selectattr(
+                                                    "statut",
+                                                    "equalto",
+                                                    StatutTicket.RESOLU
+                                                )
+                                                |list
+                                                |length
+                                            }}
+
+                                        </span>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
 
                 </div>
 
@@ -240,7 +322,9 @@
 
                 <div class="empty-state">
 
-                    <h3>Aucun technicien</h3>
+                    <h3>
+                        Aucun technicien
+                    </h3>
 
                     <p>
                         Aucun compte technicien n'est enregistré.
@@ -257,4 +341,5 @@
 </div>
 
 </body>
+
 </html>

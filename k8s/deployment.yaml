@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: ticket-management
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: ticket-management
+
+  template:
+    metadata:
+      labels:
+        app: ticket-management
+
+    spec:
+      imagePullSecrets:
+        - name: gitlab-registry
+      containers:
+        - name: ticket-management
+          image: registry.gitlab.com/kassimibasma17/ticket-management-pfa:e7b59950
+
+          ports:
+            - containerPort: 5000
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: flask-secrets
+                  key: DATABASE_URL
+
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: flask-secrets
+                  key: SECRET_KEY
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"

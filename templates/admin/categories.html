@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Catégories - Administration</title>
+    <title>Gestion des catégories</title>
 
     <link
         rel="stylesheet"
@@ -13,10 +13,10 @@
     >
 </head>
 
-<body class="admin-dashboard-page">
-
+<body class="admin-dashboard-page admin-page">
 <div class="app-shell">
 
+    <!-- ================= SIDEBAR ================= -->
     <aside class="user-sidebar">
 
         <div class="user-brand">
@@ -79,6 +79,11 @@
                 Catégories
             </a>
 
+            <a href="{{ url_for('admin_statistiques') }}"
+   class="sidebar-item">
+    Statistiques
+</a>
+
         </div>
 
 
@@ -88,10 +93,10 @@
                 COMPTE
             </span>
 
-           <a href="{{ url_for('admin_profil') }}"
-   class="sidebar-item">
-    Profil
-</a>
+            <a href="{{ url_for('admin_profil') }}"
+               class="sidebar-item">
+                Profil
+            </a>
 
         </div>
 
@@ -116,19 +121,35 @@
     </aside>
 
 
-    <main class="user-main">
+    <!-- ================= MAIN ================= -->
+    <main class="user-main admin-categories-page">
 
-        <div class="dashboard-header">
+        <!-- HEADER -->
+        <div class="categories-page-header">
 
-            <h1>Catégories</h1>
+            <div>
+                <h1>Gestion des catégories</h1>
 
-            <p>
-                Gérez les catégories utilisées pour classer les tickets.
-            </p>
+                <div class="title-line"></div>
+
+                <p>
+                    Liste des catégories utilisées pour classer les tickets
+                </p>
+            </div>
+
+
+            <button
+                type="button"
+                class="add-category-button"
+                onclick="toggleAddCategory()"
+            >
+                + Nouvelle catégorie
+            </button>
 
         </div>
 
 
+        <!-- FLASH -->
         {% with messages = get_flashed_messages() %}
 
             {% if messages %}
@@ -136,11 +157,9 @@
                 <div class="flash-container">
 
                     {% for message in messages %}
-
                         <div class="flash-message">
                             {{ message }}
                         </div>
-
                     {% endfor %}
 
                 </div>
@@ -150,138 +169,343 @@
         {% endwith %}
 
 
-        <div class="admin-categories-grid">
+        <!-- ================= AJOUT ================= -->
+        <section
+            id="category-add-panel"
+            class="category-add-panel"
+        >
 
-            <!-- AJOUT -->
-            <section class="dashboard-card category-form-card">
+            <div class="category-form-header">
+                <h2>Ajouter une catégorie</h2>
+            </div>
 
-                <div class="panel-header">
 
-                    <div>
-                        <h2>Nouvelle catégorie</h2>
-                        <p>Ajouter une catégorie de ticket</p>
-                    </div>
+            <form
+                method="POST"
+                action="{{ url_for('admin_ajouter_categorie') }}"
+                class="category-add-form"
+            >
+
+                <div class="category-form-field">
+
+                    <label for="nom">
+                        Nom *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nom"
+                        name="nom"
+                        placeholder="Ex : Sécurité"
+                        required
+                    >
 
                 </div>
 
 
-                <form
-                    method="POST"
-                    action="{{ url_for('admin_ajouter_categorie') }}"
-                    class="category-form"
-                >
+                <div class="category-form-field">
 
-                    <div class="form-group">
+                    <label for="description">
+                        Description
+                    </label>
 
-                        <label for="nom">
-                            Nom
-                        </label>
+                    <textarea
+                        id="description"
+                        name="description"
+                        rows="3"
+                        placeholder="Description de la catégorie..."
+                    ></textarea>
 
-                        <input
-                            type="text"
-                            id="nom"
-                            name="nom"
-                            placeholder="Ex : Réseau"
-                            required
-                        >
-
-                    </div>
+                </div>
 
 
-                    <div class="form-group">
+                <div class="category-form-buttons">
 
-                        <label for="description">
-                            Description
-                        </label>
-
-                        <textarea
-                            id="description"
-                            name="description"
-                            rows="4"
-                            placeholder="Description de la catégorie..."
-                        ></textarea>
-
-                    </div>
-
-
-                    <button type="submit">
-                        Ajouter la catégorie
+                    <button
+                        type="button"
+                        class="category-cancel-button"
+                        onclick="toggleAddCategory()"
+                    >
+                        Annuler
                     </button>
 
-                </form>
-
-            </section>
-
-
-            <!-- LISTE -->
-            <section class="dashboard-card categories-list-card">
-
-                <div class="panel-header">
-
-                    <div>
-                        <h2>Liste des catégories</h2>
-                        <p>Catégories disponibles</p>
-                    </div>
-
-                    <span>
-                        {{ categories|length }} catégorie(s)
-                    </span>
+                    <button
+                        type="submit"
+                        class="category-save-button"
+                    >
+                        Ajouter
+                    </button>
 
                 </div>
 
+            </form>
 
-                {% if categories %}
+        </section>
 
-                    <div class="categories-list">
+
+        <!-- ================= RECHERCHE ================= -->
+
+<section class="users-search-section">
+
+    <form
+        method="GET"
+        action="{{ url_for('admin_categories') }}"
+        class="users-search-form"
+    >
+
+        <div class="users-search-wrapper">
+
+            <input
+                type="text"
+                name="q"
+                value="{{ recherche or '' }}"
+                placeholder="Rechercher une catégorie..."
+            >
+
+            <button type="submit" aria-label="Rechercher">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M10.5 4a6.5 6.5 0 1 0 0 13a6.5 6.5 0 0 0 0-13ZM2 10.5a8.5 8.5 0 1 1 15.3 5.1l4.05 4.05a1 1 0 0 1-1.42 1.42l-4.04-4.05A8.5 8.5 0 0 1 2 10.5Z"/>
+                </svg>
+            </button>
+
+        </div>
+
+        {% if recherche %}
+            <a
+                href="{{ url_for('admin_categories') }}"
+                class="users-search-reset"
+            >
+                Réinitialiser
+            </a>
+        {% endif %}
+
+    </form>
+
+</section>
+        <!-- ================= TABLEAU ================= -->
+        <section class="categories-table-card">
+
+            <div class="categories-table-header">
+
+                <h2>
+                    Liste des catégories
+                </h2>
+
+                <span>
+                    {{ categories|length }} catégorie(s)
+                </span>
+
+            </div>
+
+
+            {% if categories %}
+
+                <div class="categories-table-wrapper">
+
+                    <table class="categories-table">
+
+                        <thead>
+
+                            <tr>
+                                
+                                <th>Nom</th>
+                                <th>Description</th>
+                                <th>Tickets</th>
+                                <th>Actions</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
 
                         {% for categorie in categories %}
 
-                            <div class="category-item">
+                            <!-- CATÉGORIE -->
+                            <tr>
 
-                                <div>
+                               
 
+                                <td>
                                     <strong>
                                         {{ categorie.nom }}
                                     </strong>
+                                </td>
 
-                                    <p>
-                                        {{ categorie.description or "Aucune description" }}
-                                    </p>
+                                <td class="category-description">
+                                    {{ categorie.description or "Aucune description" }}
+                                </td>
 
-                                </div>
+                                <td>
+                                    <span class="category-count">
+                                        {{ categorie.tickets|length }}
+                                    </span>
+                                </td>
 
-                                <span class="category-ticket-count">
-                                    {{ categorie.tickets|length }} ticket(s)
-                                </span>
+                                <td>
 
-                            </div>
+                                    <div class="category-table-actions">
+
+                                        <!-- MODIFIER -->
+                                        <button
+                                            type="button"
+                                            class="category-action-button edit"
+                                            onclick="toggleEditCategory({{ categorie.id }})"
+                                        >
+                                            Modifier
+                                        </button>
+
+
+                                        <!-- SUPPRIMER -->
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for(
+                                                'supprimer_categorie',
+                                                categorie_id=categorie.id
+                                            ) }}"
+                                            onsubmit="return confirm(
+                                                'Voulez-vous vraiment supprimer cette catégorie ?'
+                                            );"
+                                        >
+
+                                            <button
+                                                type="submit"
+                                                class="category-action-button delete"
+                                            >
+                                                Supprimer
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+
+                            <!-- FORMULAIRE MODIFICATION -->
+                            <tr
+                                id="edit-category-{{ categorie.id }}"
+                                class="category-edit-row"
+                            >
+
+                                <td colspan="5">
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for(
+                                            'modifier_categorie',
+                                            categorie_id=categorie.id
+                                        ) }}"
+                                        class="category-edit-form"
+                                    >
+
+                                        <div>
+
+                                            <label>
+                                                Nom
+                                            </label>
+
+                                            <input
+                                                type="text"
+                                                name="nom"
+                                                value="{{ categorie.nom }}"
+                                                required
+                                            >
+
+                                        </div>
+
+
+                                        <div>
+
+                                            <label>
+                                                Description
+                                            </label>
+
+                                            <input
+                                                type="text"
+                                                name="description"
+                                                value="{{ categorie.description or '' }}"
+                                            >
+
+                                        </div>
+
+
+                                        <button
+                                            type="submit"
+                                            class="category-save-button"
+                                        >
+                                            Enregistrer
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            class="category-cancel-button"
+                                            onclick="toggleEditCategory({{ categorie.id }})"
+                                        >
+                                            Annuler
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
 
                         {% endfor %}
 
-                    </div>
+                        </tbody>
+
+                    </table>
+
+                </div>
 
 
-                {% else %}
+            {% else %}
 
-                    <div class="empty-state">
+                <div class="empty-state">
 
-                        <h3>Aucune catégorie</h3>
+                    <h3>Aucune catégorie</h3>
 
-                        <p>
-                            Ajoutez votre première catégorie.
-                        </p>
+                    <p>
+                        Ajoutez votre première catégorie.
+                    </p>
 
-                    </div>
+                </div>
 
-                {% endif %}
+            {% endif %}
 
-            </section>
-
-        </div>
+        </section>
 
     </main>
 
 </div>
+
+
+<script>
+
+function toggleAddCategory() {
+
+    const panel =
+        document.getElementById("category-add-panel");
+
+    panel.classList.toggle("active");
+
+}
+
+
+function toggleEditCategory(id) {
+
+    const row =
+        document.getElementById("edit-category-" + id);
+
+    row.classList.toggle("active");
+
+}
+
+</script>
 
 </body>
 </html>

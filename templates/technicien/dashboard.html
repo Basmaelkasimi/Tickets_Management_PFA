@@ -1,27 +1,518 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Dashboard Technicien - Ticket Management</title>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Dashboard Technicien - Ticket Management
+    </title>
 
     <link
         rel="stylesheet"
         href="{{ url_for('static', filename='css/style.css') }}"
     >
+
+    <style>
+
+
+
+
+
+        /* =========================================
+           KPI DASHBOARD TECHNICIEN
+        ========================================= */
+
+        .tech-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .tech-kpi-card {
+            display: block;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 22px;
+            min-height: 130px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .tech-kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+        }
+
+        .tech-kpi-label {
+            display: block;
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .tech-kpi-value {
+            display: block;
+            color: #172554;
+            font-size: 30px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 10px;
+        }
+
+        .tech-kpi-card small {
+            display: block;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .tech-kpi-total {
+            border-top: 4px solid #2563eb;
+        }
+
+        .tech-kpi-progress {
+            border-top: 4px solid #f59e0b;
+        }
+
+        .tech-kpi-waiting {
+            border-top: 4px solid #eab308;
+        }
+
+        .tech-kpi-resolved {
+            border-top: 4px solid #22c55e;
+        }
+
+
+        /* =========================================
+           MODE GESTION
+        ========================================= */
+
+        .treatment-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .treatment-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            gap: 15px;
+        }
+
+        .treatment-navigation h1 {
+            margin: 0;
+            color: #172554;
+            font-size: 26px;
+        }
+
+        .treatment-navigation-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .treatment-back {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 10px 18px;
+
+            border-radius: 8px;
+
+            text-decoration: none;
+            font-weight: 600;
+
+            background: #2563eb;
+            color: white;
+        }
+
+        .treatment-cancel {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 10px 18px;
+
+            border-radius: 8px;
+
+            text-decoration: none;
+            font-weight: 600;
+
+            background: #ffffff;
+            color: #475569;
+
+            border: 1px solid #cbd5e1;
+        }
+
+        .treatment-back:hover {
+            background: #1d4ed8;
+        }
+
+        .treatment-cancel:hover {
+            background: #f8fafc;
+        }
+
+
+        /* =========================================
+           FORMULAIRE DE RÉSOLUTION
+        ========================================= */
+
+        .resolution-form {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+
+            width: 100%;
+            margin-top: 28px;
+        }
+
+
+        /* =========================================
+           SOLUTIONS SUGGÉRÉES
+        ========================================= */
+
+        .solutions-suggerees {
+            width: 100%;
+            box-sizing: border-box;
+
+            margin: 0 0 30px;
+            padding: 0;
+
+            background: transparent;
+            border: none;
+        }
+
+        .solutions-suggerees h4 {
+            margin: 0 0 6px;
+
+            color: #0f172a;
+
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .suggestion-info {
+            margin: 0 0 20px;
+
+            color: #64748b;
+
+            font-size: 13px;
+        }
+
+
+        /* =========================================
+           CARTES DES SOLUTIONS
+        ========================================= */
+
+        .solution-suggestion {
+            display: block;
+
+            width: 100%;
+            min-height: 115px;
+
+            box-sizing: border-box;
+
+            margin-bottom: 14px;
+            padding: 20px 25px;
+
+            text-align: left;
+
+            background: #ffffff;
+
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+
+            cursor: pointer;
+
+            transition:
+                background 0.2s ease,
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .solution-suggestion:last-child {
+            margin-bottom: 0;
+        }
+
+        .solution-suggestion:hover {
+            background: #f8fbff;
+
+            border-color: #93b4e8;
+
+            box-shadow:
+                0 3px 10px
+                rgba(15, 23, 42, 0.05);
+        }
+
+        .solution-suggestion strong {
+            display: block;
+
+            margin-bottom: 7px;
+
+            color: #1d4ed8;
+
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .solution-suggestion span {
+            display: block;
+
+            margin-bottom: 8px;
+
+            color: #1e293b;
+
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .solution-suggestion small {
+            display: block;
+
+            color: #64748b;
+
+            font-size: 12px;
+        }
+
+
+        /* =========================================
+           AUCUNE SUGGESTION
+        ========================================= */
+
+        .no-suggestion {
+            width: 100%;
+
+            box-sizing: border-box;
+
+            padding: 16px 18px;
+
+            background: #f8fafc;
+
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+
+            color: #64748b;
+
+            font-size: 13px;
+        }
+
+
+        /* =========================================
+           SOLUTION APPLIQUÉE
+        ========================================= */
+
+        .resolution-form label {
+            display: block;
+
+            margin: 0 0 10px;
+
+            color: #0f172a;
+
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .resolution-form textarea {
+            display: block;
+
+            width: 100%;
+            min-height: 120px;
+
+            box-sizing: border-box;
+
+            padding: 14px 16px;
+
+            background: #ffffff;
+
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+
+            font-family: inherit;
+            font-size: 14px;
+
+            resize: vertical;
+        }
+
+        .resolution-form textarea:focus {
+            outline: none;
+
+            border-color: #2563eb;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(37, 99, 235, 0.08);
+        }
+
+        .resolution-form .action-button.success {
+            align-self: flex-start;
+            margin-top: 14px;
+        }
+
+
+
+        /* =========================================
+           RESPONSIVE
+        ========================================= */
+
+        @media (max-width: 1000px) {
+
+            .tech-kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .tech-kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .treatment-navigation {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+
+
+
+        }
+
+  /* =========================================================
+   IDENTITÉ VISUELLE — ESPACE TECHNICIEN
+   Bleu pétrole professionnel
+========================================================= */
+
+.technician-dashboard-page {
+    --tech-primary: #0f5f6d;
+    --tech-primary-dark: #0b4b56;
+    --tech-primary-light: #eef7f8;
+    --tech-border: #b8d7dc;
+}
+
+
+/* Logo TM */
+.technician-dashboard-page .brand-mark {
+    background: var(--tech-primary);
+}
+
+
+/* Élément actif dans la sidebar */
+.technician-dashboard-page .sidebar-item.active {
+    background: var(--tech-primary-light);
+    color: var(--tech-primary);
+    border-left: 3px solid var(--tech-primary);
+}
+
+
+/* Hover sidebar */
+.technician-dashboard-page .sidebar-item:hover {
+    color: var(--tech-primary);
+}
+
+
+/* Boutons principaux */
+.technician-dashboard-page .action-button:not(.secondary):not(.success) {
+    background: var(--tech-primary);
+    border-color: var(--tech-primary);
+    color: #ffffff;
+}
+
+.technician-dashboard-page .action-button:not(.secondary):not(.success):hover {
+    background: var(--tech-primary-dark);
+    border-color: var(--tech-primary-dark);
+}
+
+
+/* Bouton revenir */
+.technician-dashboard-page .treatment-back {
+    background: var(--tech-primary);
+    color: #ffffff;
+}
+
+.technician-dashboard-page .treatment-back:hover {
+    background: var(--tech-primary-dark);
+}
+
+
+/* Recherche */
+.technician-dashboard-page .ticket-filter-form button {
+    background: var(--tech-primary);
+    border-color: var(--tech-primary);
+    color: #ffffff;
+}
+
+.technician-dashboard-page .ticket-filter-form button:hover {
+    background: var(--tech-primary-dark);
+}
+
+
+/* Ticket sélectionné */
+.technician-dashboard-page .ticket-list-item.active {
+    background: var(--tech-primary-light);
+    border-color: var(--tech-border);
+}
+
+
+/* Numéro du ticket */
+.technician-dashboard-page .ticket-number {
+    color: var(--tech-primary);
+}
+
+
+/* Cartes de solutions */
+.technician-dashboard-page .solution-suggestion strong {
+    color: var(--tech-primary);
+}
+
+.technician-dashboard-page .solution-suggestion:hover {
+    background: var(--tech-primary-light);
+    border-color: var(--tech-border);
+}
+
+
+/* Focus champs */
+.technician-dashboard-page input:focus,
+.technician-dashboard-page select:focus,
+.technician-dashboard-page textarea:focus {
+    outline: none;
+    border-color: var(--tech-primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(15, 95, 109, 0.10);
+}
+
+
+    </style>
+
 </head>
 
-<body class="technician-dashboard-page">
+
+<body class="technician-dashboard-page technician-page">
 
 <div class="app-shell">
 
-    <!-- =========================================================
+
+    <!-- =========================================
          SIDEBAR
-    ========================================================== -->
+    ========================================== -->
+
     <aside class="user-sidebar">
+
 
         <div class="user-brand">
 
@@ -30,8 +521,15 @@
             </div>
 
             <div>
-                <strong>Ticket Management</strong>
-                <span>Helpdesk</span>
+
+                <strong>
+                    Ticket Management
+                </strong>
+
+                <span>
+                    Helpdesk
+                </span>
+
             </div>
 
         </div>
@@ -39,9 +537,11 @@
 
         <div class="sidebar-section">
 
+
             <span class="sidebar-title">
                 ESPACE TECHNICIEN
             </span>
+
 
             <a
                 href="{{ url_for('dashboard_technicien') }}"
@@ -50,28 +550,38 @@
                 Tableau de bord
             </a>
 
-            <!-- On activera ces liens quand les pages seront créées -->
 
             <a
-                href="{{ url_for('dashboard_technicien') }}"
+                href="{{ url_for('tickets_technicien') }}"
                 class="sidebar-item"
             >
                 Mes tickets
             </a>
 
+
             <a
-                href="#"
+                href="{{ url_for('historique_technicien') }}"
                 class="sidebar-item"
             >
                 Historique
             </a>
 
+
             <a
-                href="#"
+                href="{{ url_for('notifications_technicien') }}"
                 class="sidebar-item"
             >
                 Notifications
             </a>
+
+
+            <a
+                href="{{ url_for('profil_technicien') }}"
+                class="sidebar-item"
+            >
+                Mon profil
+            </a>
+
 
         </div>
 
@@ -95,39 +605,21 @@
 
         </div>
 
+
     </aside>
 
 
-    <!-- =========================================================
+    <!-- =========================================
          CONTENU PRINCIPAL
-    ========================================================== -->
+    ========================================== -->
+
     <main class="user-main">
 
 
-        <!-- =====================================================
-             HEADER
-        ====================================================== -->
-        <div class="dashboard-header">
+        <!-- =====================================
+             FLASH
+        ====================================== -->
 
-            <div>
-
-                <h1>
-                    Tableau de bord technicien
-                </h1>
-
-                <p>
-                    Bienvenue {{ current_user.nom }},
-                    gérez les tickets qui vous sont assignés.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <!-- =====================================================
-             MESSAGES FLASH
-        ====================================================== -->
         {% with messages = get_flashed_messages() %}
 
             {% if messages %}
@@ -149,684 +641,1375 @@
         {% endwith %}
 
 
-        <!-- =====================================================
-             STATISTIQUES
-        ====================================================== -->
-        <section class="stats-grid">
+        <!-- =================================================
+             MODE NORMAL
+        ================================================== -->
 
-            <div class="stat-card">
-
-                <span>
-                    Total assignés
-                </span>
-
-                <strong>
-                    {{ total_tickets }}
-                </strong>
-
-            </div>
+        {% if not mode_traitement %}
 
 
-            <div class="stat-card">
+            <!-- ===============================
+                 HEADER
+            ================================ -->
 
-                <span>
-                    En cours
-                </span>
+            <div class="dashboard-header">
 
-                <strong>
-                    {{ tickets_en_cours }}
-                </strong>
+    <div>
+        <h1>Tableau de bord technicien</h1>
+        <div class="technician-title-line"></div>
 
-            </div>
+        <p>
+            Bienvenue {{ current_user.nom }},
+            gérez les tickets qui vous sont assignés.
+        </p>
+    </div>
 
+    <a href="{{ url_for('profil_technicien') }}"
+       class="technician-header-profile">
 
-            <div class="stat-card">
+        <div class="technician-header-profile-info">
+            <strong>{{ current_user.nom }}</strong>
+            <span>Technicien</span>
+        </div>
 
-                <span>
-                    En attente
-                </span>
+        <div class="technician-header-avatar">
+            {{ current_user.nom[0]|upper }}
+        </div>
 
-                <strong>
-                    {{ tickets_attente }}
-                </strong>
+    </a>
 
-            </div>
-
-
-            <div class="stat-card">
-
-                <span>
-                    Résolus
-                </span>
-
-                <strong>
-                    {{ tickets_resolus }}
-                </strong>
-
-            </div>
-
-        </section>
+</div>
 
 
-        <!-- =====================================================
-             RECHERCHE ET FILTRES
-        ====================================================== -->
-        <section class="ticket-toolbar">
+            <!-- ===============================
+                 KPI
+            ================================ -->
 
-            <form
-                method="GET"
-                action="{{ url_for('dashboard_technicien') }}"
-                class="ticket-filter-form"
-            >
-
-                <input
-                    type="text"
-                    name="q"
-                    placeholder="Rechercher par titre ou numéro..."
-                    value="{{ request.args.get('q', '') }}"
-                >
+            <section class="tech-kpi-grid">
 
 
-                <select name="statut">
+                <div class="tech-kpi-card tech-kpi-total">
 
-                    <option
-                        value=""
-                        {% if not request.args.get('statut') %}
-                            selected
-                        {% endif %}
-                    >
-                        Tous les statuts
-                    </option>
-
-
-                    <option
-                        value="ASSIGNE"
-                        {% if request.args.get('statut') == 'ASSIGNE' %}
-                            selected
-                        {% endif %}
-                    >
-                        Assigné
-                    </option>
-
-
-                    <option
-                        value="EN_COURS"
-                        {% if request.args.get('statut') == 'EN_COURS' %}
-                            selected
-                        {% endif %}
-                    >
-                        En cours
-                    </option>
-
-
-                    <option
-                        value="EN_ATTENTE"
-                        {% if request.args.get('statut') == 'EN_ATTENTE' %}
-                            selected
-                        {% endif %}
-                    >
-                        En attente
-                    </option>
-
-
-                    <option
-                        value="RESOLU"
-                        {% if request.args.get('statut') == 'RESOLU' %}
-                            selected
-                        {% endif %}
-                    >
-                        Résolu
-                    </option>
-
-                </select>
-
-
-                <button type="submit">
-                    Rechercher
-                </button>
-
-
-                {% if request.args.get('q') or request.args.get('statut') %}
-
-                    <a
-                        href="{{ url_for('dashboard_technicien') }}"
-                        class="filter-reset"
-                    >
-                        Réinitialiser
-                    </a>
-
-                {% endif %}
-
-            </form>
-
-        </section>
-
-
-        <!-- =====================================================
-             LISTE + DETAIL
-        ====================================================== -->
-        <section class="dashboard-ticket-layout">
-
-
-            <!-- =================================================
-                 LISTE DES TICKETS
-            ================================================== -->
-            <div class="ticket-list-panel">
-
-                <div class="panel-header">
-
-                    <h2>
-                        Mes tickets
-                    </h2>
-
-                    <span>
-                        {{ tickets|length }} ticket(s)
+                    <span class="tech-kpi-label">
+                        Total assignés
                     </span>
+
+                    <strong class="tech-kpi-value">
+                        {{ total_tickets }}
+                    </strong>
+
+                    <small>
+                        Tous les tickets qui vous sont assignés
+                    </small>
 
                 </div>
 
 
-                {% if tickets %}
+                <div class="tech-kpi-card tech-kpi-progress">
 
-                    {% for ticket in tickets %}
+                    <span class="tech-kpi-label">
+                        En cours
+                    </span>
+
+                    <strong class="tech-kpi-value">
+                        {{ tickets_en_cours }}
+                    </strong>
+
+                    <small>
+                        Tickets actuellement en traitement
+                    </small>
+
+                </div>
+
+
+                <div class="tech-kpi-card tech-kpi-waiting">
+
+                    <span class="tech-kpi-label">
+                        En attente
+                    </span>
+
+                    <strong class="tech-kpi-value">
+                        {{ tickets_attente }}
+                    </strong>
+
+                    <small>
+                        Tickets temporairement en attente
+                    </small>
+
+                </div>
+
+
+                <div class="tech-kpi-card tech-kpi-resolved">
+
+                    <span class="tech-kpi-label">
+                        Résolus
+                    </span>
+
+                    <strong class="tech-kpi-value">
+                        {{ tickets_resolus }}
+                    </strong>
+
+                    <small>
+                        Tickets résolus ou terminés
+                    </small>
+
+                </div>
+
+
+            </section>
+
+                        <!-- ===============================
+                 RECHERCHE ET FILTRES
+            ================================ -->
+
+            <section class="ticket-toolbar">
+
+                <form
+                    method="GET"
+                    action="{{ url_for('dashboard_technicien') }}"
+                    class="ticket-filter-form"
+                >
+
+                    <input
+                        type="text"
+                        name="q"
+                        placeholder="Rechercher par titre ou numéro..."
+                        value="{{ request.args.get('q', '') }}"
+                    >
+
+
+                    <select name="statut">
+
+                        <option
+                            value=""
+                            {% if not request.args.get('statut') %}
+                                selected
+                            {% endif %}
+                        >
+                            Tous les statuts
+                        </option>
+
+                        <option
+                            value="ASSIGNE"
+                            {% if request.args.get('statut') == 'ASSIGNE' %}
+                                selected
+                            {% endif %}
+                        >
+                            Assigné
+                        </option>
+
+                        <option
+                            value="EN_COURS"
+                            {% if request.args.get('statut') == 'EN_COURS' %}
+                                selected
+                            {% endif %}
+                        >
+                            En cours
+                        </option>
+
+                        <option
+                            value="EN_ATTENTE"
+                            {% if request.args.get('statut') == 'EN_ATTENTE' %}
+                                selected
+                            {% endif %}
+                        >
+                            En attente
+                        </option>
+
+                        <option
+                            value="RESOLU"
+                            {% if request.args.get('statut') == 'RESOLU' %}
+                                selected
+                            {% endif %}
+                        >
+                            Résolu
+                        </option>
+
+                    </select>
+
+
+                    <button type="submit">
+                        Rechercher
+                    </button>
+
+
+                    {% if
+                        request.args.get('q')
+                        or
+                        request.args.get('statut')
+                    %}
 
                         <a
-                            href="{{ url_for(
-                                'dashboard_technicien',
-                                ticket=ticket.id,
-                                q=request.args.get('q', ''),
-                                statut=request.args.get('statut', '')
-                            ) }}"
-                            class="ticket-list-item
-                            {% if selected_ticket and selected_ticket.id == ticket.id %}
-                                active
-                            {% endif %}"
+                            href="{{ url_for('dashboard_technicien') }}"
+                            class="filter-reset"
                         >
-
-                            <div class="ticket-list-content">
-
-                                <strong>
-                                    #{{ ticket.id }} - {{ ticket.titre }}
-                                </strong>
-
-
-                                <span>
-                                    {{ ticket.categorie.nom }}
-                                </span>
-
-
-                                <small>
-                                    {{ ticket.date_creation.strftime('%d/%m/%Y %H:%M') }}
-                                </small>
-
-                            </div>
-
-
-                            <div class="ticket-list-meta">
-
-                                <span class="ticket-priority">
-                                    {{ ticket.priorite.value }}
-                                </span>
-
-                                <span
-                                    class="ticket-status status-{{ ticket.statut.value|lower }}"
-                                >
-                                    {{ ticket.statut.value.replace('_', ' ') }}
-                                </span>
-
-                            </div>
-
+                            Réinitialiser
                         </a>
 
-                    {% endfor %}
+                    {% endif %}
 
+                </form>
 
-                {% else %}
-
-                    <div class="empty-state">
-
-                        <h3>
-                            Aucun ticket
-                        </h3>
-
-                        <p>
-                            Aucun ticket ne correspond aux critères sélectionnés.
-                        </p>
-
-                    </div>
-
-                {% endif %}
-
-            </div>
+            </section>
 
 
             <!-- =================================================
-                 DETAIL DU TICKET
+                 LISTE + DÉTAIL DU TICKET
             ================================================== -->
-            <div class="ticket-detail-panel">
 
-                {% if selected_ticket %}
-
-
-                    <!-- =========================================
-                         EN-TETE TICKET
-                    ========================================== -->
-                    <div class="ticket-detail-header">
-
-                        <div>
-
-                            <span class="ticket-number">
-                                Ticket #{{ selected_ticket.id }}
-                            </span>
-
-                            <h2>
-                                {{ selected_ticket.titre }}
-                            </h2>
-
-                        </div>
+            <section class="dashboard-ticket-layout">
 
 
-                        <span
-                            class="ticket-status status-{{ selected_ticket.statut.value|lower }}"
-                        >
-                            {{ selected_ticket.statut.value.replace('_', ' ') }}
+                <!-- =====================================
+                     LISTE DES TICKETS
+                ====================================== -->
+
+                <div class="ticket-list-panel">
+
+
+                    <div class="panel-header">
+
+                        <h2>
+                            Mes tickets
+                        </h2>
+
+                        <span>
+                            {{ tickets|length }} ticket(s)
                         </span>
 
                     </div>
 
 
-                    <!-- =========================================
-                         INFORMATIONS
-                    ========================================== -->
-                    <div class="ticket-info-grid">
+                    {% if tickets %}
 
-                        <div>
 
-                            <span>
-                                Priorité
-                            </span>
+                        {% for ticket in tickets %}
 
-                            <strong>
-                                {{ selected_ticket.priorite.value }}
-                            </strong>
+
+                            <a
+                                href="{{
+                                    url_for(
+                                        'dashboard_technicien',
+                                        ticket=ticket.id,
+                                        q=request.args.get('q', ''),
+                                        statut=request.args.get('statut', '')
+                                    )
+                                }}"
+                                class="
+                                    ticket-list-item
+
+                                    {% if
+                                        selected_ticket
+                                        and
+                                        selected_ticket.id == ticket.id
+                                    %}
+                                        active
+                                    {% endif %}
+                                "
+                            >
+
+
+                                <div class="ticket-list-content">
+
+                                    <strong>
+                                        #{{ ticket.id }} - {{ ticket.titre }}
+                                    </strong>
+
+                                    <span>
+                                        {{ ticket.categorie.nom }}
+                                    </span>
+
+                                    <small>
+                                        {{
+                                            ticket.date_creation.strftime(
+                                                '%d/%m/%Y %H:%M'
+                                            )
+                                        }}
+                                    </small>
+
+                                </div>
+
+
+                                <div class="ticket-list-meta">
+
+                                    <span class="ticket-priority">
+                                        {{ ticket.priorite.value }}
+                                    </span>
+
+                                    <span
+                                        class="
+                                            ticket-status
+                                            status-{{
+                                                ticket.statut.value|lower
+                                            }}
+                                        "
+                                    >
+                                        {{
+                                            ticket.statut.value.replace(
+                                                '_',
+                                                ' '
+                                            )
+                                        }}
+                                    </span>
+
+                                </div>
+
+
+                            </a>
+
+
+                        {% endfor %}
+
+
+                    {% else %}
+
+
+                        <div class="empty-state">
+
+                            <h3>
+                                Aucun ticket
+                            </h3>
+
+                            <p>
+                                Aucun ticket ne correspond
+                                aux critères sélectionnés.
+                            </p>
 
                         </div>
 
 
-                        <div>
+                    {% endif %}
 
-                            <span>
-                                Catégorie
+
+                </div>
+
+
+                <!-- =====================================
+                     DÉTAIL DU TICKET
+                ====================================== -->
+
+                <div class="ticket-detail-panel">
+
+
+                    {% if selected_ticket %}
+
+
+                        <!-- ===============================
+                             EN-TÊTE DU TICKET
+                        ================================ -->
+
+                        <div class="ticket-detail-header">
+
+
+                            <div>
+
+                                <span class="ticket-number">
+                                    Ticket #{{ selected_ticket.id }}
+                                </span>
+
+                                <h2>
+                                    {{ selected_ticket.titre }}
+                                </h2>
+
+                            </div>
+
+
+                            <span
+                                class="
+                                    ticket-status
+                                    status-{{
+                                        selected_ticket.statut.value|lower
+                                    }}
+                                "
+                            >
+                                {{
+                                    selected_ticket.statut.value.replace(
+                                        '_',
+                                        ' '
+                                    )
+                                }}
                             </span>
 
-                            <strong>
-                                {{ selected_ticket.categorie.nom }}
-                            </strong>
 
                         </div>
 
 
-                        <div>
+                        <!-- ===============================
+                             INFORMATIONS
+                        ================================ -->
 
-                            <span>
-                                Demandeur
-                            </span>
+                        <div class="ticket-info-grid">
 
-                            <strong>
-                                {{ selected_ticket.demandeur.nom }}
-                            </strong>
-
-                        </div>
-
-
-                        <div>
-
-                            <span>
-                                Date de création
-                            </span>
-
-                            <strong>
-                                {{ selected_ticket.date_creation.strftime('%d/%m/%Y %H:%M') }}
-                            </strong>
-
-                        </div>
-
-
-                        {% if selected_ticket.date_resolution %}
 
                             <div>
 
                                 <span>
-                                    Date de résolution
+                                    Priorité
                                 </span>
 
                                 <strong>
-                                    {{ selected_ticket.date_resolution.strftime('%d/%m/%Y %H:%M') }}
+                                    {{ selected_ticket.priorite.value }}
                                 </strong>
 
                             </div>
 
-                        {% endif %}
 
-                    </div>
+                            <div>
 
-
-                    <!-- =========================================
-                         DESCRIPTION
-                    ========================================== -->
-                    <div class="ticket-description">
-
-                        <h3>
-                            Description
-                        </h3>
-
-                        <p>
-                            {{ selected_ticket.description }}
-                        </p>
-
-                    </div>
-
-
-                    <!-- =========================================
-                         ACTIONS TECHNICIEN
-                    ========================================== -->
-                    <div class="ticket-actions">
-
-                        <h3>
-                            Gestion du ticket
-                        </h3>
-
-
-                        {% if selected_ticket.statut.value == "ASSIGNE" %}
-
-                            <form
-                                method="POST"
-                                action="{{ url_for(
-                                    'modifier_statut_ticket',
-                                    ticket_id=selected_ticket.id
-                                ) }}"
-                            >
-
-                                <input
-                                    type="hidden"
-                                    name="statut"
-                                    value="EN_COURS"
-                                >
-
-                                <button
-                                    type="submit"
-                                    class="action-button"
-                                >
-                                    Commencer le traitement
-                                </button>
-
-                            </form>
-
-
-                        {% elif selected_ticket.statut.value == "EN_COURS" %}
-
-                            <div class="ticket-action-buttons">
-
-
-                                <form
-                                    method="POST"
-                                    action="{{ url_for(
-                                        'modifier_statut_ticket',
-                                        ticket_id=selected_ticket.id
-                                    ) }}"
-                                >
-
-                                    <input
-                                        type="hidden"
-                                        name="statut"
-                                        value="EN_ATTENTE"
-                                    >
-
-                                    <button
-                                        type="submit"
-                                        class="action-button secondary"
-                                    >
-                                        Mettre en attente
-                                    </button>
-
-                                </form>
-
-
-                                <form
-                                    method="POST"
-                                    action="{{ url_for(
-                                        'modifier_statut_ticket',
-                                        ticket_id=selected_ticket.id
-                                    ) }}"
-                                >
-
-                                    <input
-                                        type="hidden"
-                                        name="statut"
-                                        value="RESOLU"
-                                    >
-
-                                    <button
-                                        type="submit"
-                                        class="action-button success"
-                                    >
-                                        Marquer comme résolu
-                                    </button>
-
-                                </form>
-
-                            </div>
-
-
-                        {% elif selected_ticket.statut.value == "EN_ATTENTE" %}
-
-                            <form
-                                method="POST"
-                                action="{{ url_for(
-                                    'modifier_statut_ticket',
-                                    ticket_id=selected_ticket.id
-                                ) }}"
-                            >
-
-                                <input
-                                    type="hidden"
-                                    name="statut"
-                                    value="EN_COURS"
-                                >
-
-                                <button
-                                    type="submit"
-                                    class="action-button"
-                                >
-                                    Reprendre le traitement
-                                </button>
-
-                            </form>
-
-
-                        {% elif selected_ticket.statut.value == "RESOLU" %}
-
-                            <div class="ticket-resolved-message">
+                                <span>
+                                    Catégorie
+                                </span>
 
                                 <strong>
-                                    Ticket résolu
+                                    {{ selected_ticket.categorie.nom }}
                                 </strong>
-
-                                <p>
-                                    Ce ticket a été marqué comme résolu.
-                                </p>
 
                             </div>
 
 
-                        {% elif selected_ticket.statut.value == "FERME" %}
+                            <div>
 
-                            <div class="ticket-resolved-message">
+                                <span>
+                                    Demandeur
+                                </span>
 
                                 <strong>
-                                    Ticket fermé
+                                    {{ selected_ticket.demandeur.nom }}
                                 </strong>
-
-                                <p>
-                                    Ce ticket est définitivement fermé.
-                                </p>
 
                             </div>
 
-                        {% endif %}
 
-                    </div>
+                            <div>
 
+                                <span>
+                                    Localisation
+                                </span>
 
-                    <!-- =========================================
-                         COMMENTAIRES
-                    ========================================== -->
-                    <div class="ticket-comments">
+                                <strong>
+                                    {{
+                                        selected_ticket.localisation
+                                        or
+                                        "Non renseignée"
+                                    }}
+                                </strong>
 
-                        <h3>
-                            Échanges avec le demandeur
-                        </h3>
-
-
-                        <div class="comments-list">
-
-                            {% if selected_ticket.commentaires %}
-
-                                {% for commentaire in selected_ticket.commentaires %}
-
-                                    <div class="comment-item">
-
-                                        <div class="comment-header">
-
-                                            <div>
-
-                                                <strong>
-                                                    {{ commentaire.auteur.nom }}
-                                                </strong>
-
-                                                {% if commentaire.auteur.role.value == "TECHNICIEN" %}
-
-                                                    <span class="comment-role">
-                                                        Technicien
-                                                    </span>
-
-                                                {% elif commentaire.auteur.role.value == "USER" %}
-
-                                                    <span class="comment-role">
-                                                        Demandeur
-                                                    </span>
-
-                                                {% elif commentaire.auteur.role.value == "ADMIN" %}
-
-                                                    <span class="comment-role">
-                                                        Administrateur
-                                                    </span>
-
-                                                {% endif %}
-
-                                            </div>
+                            </div>
 
 
-                                            <small>
-                                                {{ commentaire.date_creation.strftime('%d/%m/%Y %H:%M') }}
-                                            </small>
+                            <div>
 
-                                        </div>
+                                <span>
+                                    Équipement concerné
+                                </span>
+
+                                <strong>
+                                    {{
+                                        selected_ticket.equipement
+                                        or
+                                        "Non précisé"
+                                    }}
+                                </strong>
+
+                            </div>
 
 
-                                        <p>
-                                            {{ commentaire.contenu }}
-                                        </p>
+                            <div>
 
-                                    </div>
+                                <span>
+                                    Date de création
+                                </span>
 
-                                {% endfor %}
+                                <strong>
+                                    {{
+                                        selected_ticket.date_creation.strftime(
+                                            '%d/%m/%Y %H:%M'
+                                        )
+                                    }}
+                                </strong>
+
+                            </div>
 
 
-                            {% else %}
+                            {% if selected_ticket.date_resolution %}
 
-                                <div class="empty-comments">
+                                <div>
 
-                                    <p>
-                                        Aucun commentaire pour ce ticket.
-                                    </p>
+                                    <span>
+                                        Date de résolution
+                                    </span>
+
+                                    <strong>
+                                        {{
+                                            selected_ticket.date_resolution.strftime(
+                                                '%d/%m/%Y %H:%M'
+                                            )
+                                        }}
+                                    </strong>
 
                                 </div>
 
                             {% endif %}
 
+
                         </div>
 
 
-                        <!-- FORMULAIRE REPONSE -->
-                        {% if selected_ticket.statut.value != "FERME" %}
+                        <!-- ===============================
+                             DESCRIPTION
+                        ================================ -->
 
-                            <form
-                                method="POST"
-                                action="{{ url_for(
-                                    'ajouter_commentaire_technicien',
-                                    ticket_id=selected_ticket.id
-                                ) }}"
-                                class="comment-form"
-                            >
+                        <div class="ticket-description">
 
-                                <label for="contenu">
-                                    Ajouter une réponse
-                                </label>
+                            <h3>
+                                Description
+                            </h3>
 
-                                <textarea
-                                    id="contenu"
-                                    name="contenu"
-                                    rows="4"
-                                    placeholder="Écrivez votre réponse au demandeur..."
-                                    required
-                                ></textarea>
+                            <p>
+                                {{ selected_ticket.description }}
+                            </p>
+
+                        </div>
 
 
-                                <button
-                                    type="submit"
+                        <!-- ===============================
+                             GESTION DU TICKET
+                        ================================ -->
+
+                        <div class="ticket-actions">
+
+
+                            <h3>
+                                Gestion du ticket
+                            </h3>
+
+
+                            <!-- TICKET ASSIGNÉ -->
+
+                            {% if selected_ticket.statut.value == "ASSIGNE" %}
+
+
+                                <form
+                                    method="POST"
+                                    action="{{
+                                        url_for(
+                                            'modifier_statut_ticket',
+                                            ticket_id=selected_ticket.id
+                                        )
+                                    }}"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="statut"
+                                        value="EN_COURS"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="action-button"
+                                    >
+                                        Commencer le traitement
+                                    </button>
+
+                                </form>
+
+
+                            <!-- TICKET EN COURS -->
+
+                            {% elif selected_ticket.statut.value == "EN_COURS" %}
+
+
+                                <a
+                                    href="{{
+                                        url_for(
+                                            'dashboard_technicien',
+                                            ticket=selected_ticket.id,
+                                            mode='traitement'
+                                        )
+                                    }}"
                                     class="action-button"
                                 >
-                                    Envoyer la réponse
-                                </button>
+                                    Continuer le traitement
+                                </a>
 
-                            </form>
 
-                        {% endif %}
+                            <!-- TICKET EN ATTENTE -->
+
+                            {% elif selected_ticket.statut.value == "EN_ATTENTE" %}
+
+
+                                <form
+                                    method="POST"
+                                    action="{{
+                                        url_for(
+                                            'modifier_statut_ticket',
+                                            ticket_id=selected_ticket.id
+                                        )
+                                    }}"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="statut"
+                                        value="EN_COURS"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="action-button"
+                                    >
+                                        Reprendre le traitement
+                                    </button>
+
+                                </form>
+
+
+                            <!-- TICKET RÉSOLU -->
+
+                            {% elif selected_ticket.statut.value == "RESOLU" %}
+
+
+                                <div class="ticket-resolved-message">
+
+                                    <strong>
+                                        Ticket résolu
+                                    </strong>
+
+                                    <p>
+                                        Ce ticket a été marqué comme résolu.
+                                    </p>
+
+                                </div>
+
+
+                            <!-- TICKET FERMÉ -->
+
+                            {% elif selected_ticket.statut.value == "FERME" %}
+
+
+                                <div class="ticket-resolved-message">
+
+                                    <strong>
+                                        Ticket fermé
+                                    </strong>
+
+                                    <p>
+                                        Ce ticket est définitivement fermé.
+                                    </p>
+
+                                </div>
+
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                        <!-- =====================================
+                             ÉCHANGES AVEC LE DEMANDEUR
+                        ====================================== -->
+
+                        <div class="ticket-comments">
+
+
+                            <h3>
+                                Échanges avec le demandeur
+                            </h3>
+
+
+                            <div class="comments-list">
+
+
+                                {% if selected_ticket.commentaires %}
+
+
+                                    {% for commentaire in selected_ticket.commentaires %}
+
+
+                                        <div class="comment-item">
+
+
+                                            <div class="comment-header">
+
+
+                                                <div>
+
+                                                    <strong>
+                                                        {{ commentaire.auteur.nom }}
+                                                    </strong>
+
+
+                                                    {% if commentaire.auteur.role.value == "TECHNICIEN" %}
+
+                                                        <span class="comment-role">
+                                                            Technicien
+                                                        </span>
+
+                                                    {% elif commentaire.auteur.role.value == "USER" %}
+
+                                                        <span class="comment-role">
+                                                            Demandeur
+                                                        </span>
+
+                                                    {% elif commentaire.auteur.role.value == "ADMIN" %}
+
+                                                        <span class="comment-role">
+                                                            Administrateur
+                                                        </span>
+
+                                                    {% endif %}
+
+                                                </div>
+
+
+                                                <small>
+                                                    {{
+                                                        commentaire.date_creation.strftime(
+                                                            '%d/%m/%Y %H:%M'
+                                                        )
+                                                    }}
+                                                </small>
+
+
+                                            </div>
+
+
+                                            <p>
+                                                {{ commentaire.contenu }}
+                                            </p>
+
+
+                                        </div>
+
+
+                                    {% endfor %}
+
+
+                                {% else %}
+
+
+                                    <div class="empty-comments">
+
+                                        <p>
+                                            Aucun commentaire pour ce ticket.
+                                        </p>
+
+                                    </div>
+
+
+                                {% endif %}
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    {% else %}
+
+
+                        <div class="empty-ticket-detail">
+
+                            <h2>
+                                Aucun ticket sélectionné
+                            </h2>
+
+                            <p>
+                                Sélectionnez un ticket
+                                pour afficher ses détails.
+                            </p>
+
+                        </div>
+
+
+                    {% endif %}
+
+
+                </div>
+
+
+            </section>
+
+
+        <!-- =================================================
+             MODE TRAITEMENT
+             La partie 3 commence ici
+        ================================================== -->
+
+        {% else %}
+
+
+                    <!-- =================================================
+                 MODE TRAITEMENT
+            ================================================== -->
+
+            {% if selected_ticket %}
+
+
+                <div class="treatment-wrapper">
+
+
+                    <!-- =====================================
+                         NAVIGATION
+                    ====================================== -->
+
+                    <div class="treatment-navigation">
+
+
+                        <h1>
+                            Gestion du ticket
+                        </h1>
+
+
+                        <div class="treatment-navigation-buttons">
+
+
+                            <a
+                                href="{{
+                                    url_for(
+                                        'dashboard_technicien',
+                                        ticket=selected_ticket.id
+                                    )
+                                }}"
+                                class="treatment-back"
+                            >
+                                ← Revenir
+                            </a>
+
+
+                           
+
+
+                        </div>
+
 
                     </div>
 
 
-                {% else %}
+                    <!-- =====================================
+                         CONTENU DU TRAITEMENT
+                    ====================================== -->
+
+                    <div class="ticket-detail-panel">
 
 
-                    <!-- =========================================
-                         AUCUN TICKET
-                    ========================================== -->
-                    <div class="empty-ticket-detail">
+                        <div class="ticket-actions">
 
-                        <h2>
-                            Aucun ticket sélectionné
-                        </h2>
 
-                        <p>
-                            Sélectionnez un ticket pour afficher ses détails.
-                        </p>
+                            <h3>
+                                Gestion du ticket
+                            </h3>
+
+
+                            <!-- =====================================
+                                 TICKET EN COURS
+                            ====================================== -->
+
+                            {% if selected_ticket.statut.value == "EN_COURS" %}
+
+
+                                <div class="ticket-action-buttons">
+
+
+                                    <!-- =============================
+                                         METTRE EN ATTENTE
+                                    ============================== -->
+
+                                    <form
+                                        method="POST"
+                                        action="{{
+                                            url_for(
+                                                'modifier_statut_ticket',
+                                                ticket_id=selected_ticket.id
+                                            )
+                                        }}"
+                                    >
+
+                                        <input
+                                            type="hidden"
+                                            name="statut"
+                                            value="EN_ATTENTE"
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="action-button secondary"
+                                        >
+                                            Mettre en attente
+                                        </button>
+
+                                    </form>
+
+
+                                    <!-- =====================================
+                                         RÉSOLUTION DU TICKET
+                                    ====================================== -->
+
+                                    <form
+                                        method="POST"
+                                        action="{{
+                                            url_for(
+                                                'modifier_statut_ticket',
+                                                ticket_id=selected_ticket.id
+                                            )
+                                        }}"
+                                        class="resolution-form"
+                                    >
+
+
+                                        <input
+                                            type="hidden"
+                                            name="statut"
+                                            value="RESOLU"
+                                        >
+
+
+                                        <!-- =====================================
+                                             SOLUTIONS SUGGÉRÉES
+                                        ====================================== -->
+
+                                        <div class="solutions-suggerees">
+
+
+                                            <h4>
+                                                Solutions suggérées
+                                            </h4>
+
+
+                                            <p class="suggestion-info">
+                                                Suggestions basées sur des tickets similaires déjà résolus.
+                                            </p>
+
+
+                                            {% if solutions_suggerees %}
+
+
+                                                {% for proposition in solutions_suggerees %}
+
+
+                                                    <button
+                                                        type="button"
+                                                        class="solution-suggestion"
+                                                        data-solution="{{ proposition.solution | e }}"
+                                                        onclick="choisirSolution(this)"
+                                                    >
+
+
+                                                        <strong>
+                                                            Solution {{ loop.index }}
+                                                        </strong>
+
+
+                                                        <span>
+                                                            {{ proposition.solution }}
+                                                        </span>
+
+
+                                                        <small>
+                                                            Ticket similaire #{{ proposition.ticket_id }}
+                                                        </small>
+
+
+                                                    </button>
+
+
+                                                {% endfor %}
+
+
+                                            {% else %}
+
+
+                                                <div class="no-suggestion">
+                                                    Aucune solution similaire trouvée dans l'historique.
+                                                </div>
+
+
+                                            {% endif %}
+
+
+                                        </div>
+
+
+                                        <!-- =====================================
+                                             SOLUTION APPLIQUÉE
+                                        ====================================== -->
+
+                                        <label for="solution_resolution">
+                                            Solution appliquée
+                                        </label>
+
+
+                                        <textarea
+                                            name="solution_resolution"
+                                            id="solution_resolution"
+                                            rows="5"
+                                            placeholder="Décrivez la solution appliquée..."
+                                            required
+                                        ></textarea>
+
+
+                                        <!-- =====================================
+                                             BOUTON RÉSOUDRE
+                                        ====================================== -->
+
+                                        <button
+                                            type="submit"
+                                            class="action-button success"
+                                        >
+                                            Marquer comme résolu
+                                        </button>
+
+
+                                    </form>
+
+
+                                </div>
+
+
+                            <!-- =====================================
+                                 TICKET EN ATTENTE
+                            ====================================== -->
+
+                            {% elif selected_ticket.statut.value == "EN_ATTENTE" %}
+
+
+                                <form
+                                    method="POST"
+                                    action="{{
+                                        url_for(
+                                            'modifier_statut_ticket',
+                                            ticket_id=selected_ticket.id
+                                        )
+                                    }}"
+                                >
+
+
+                                    <input
+                                        type="hidden"
+                                        name="statut"
+                                        value="EN_COURS"
+                                    >
+
+
+                                    <button
+                                        type="submit"
+                                        class="action-button"
+                                    >
+                                        Reprendre le traitement
+                                    </button>
+
+
+                                </form>
+
+
+                            <!-- =====================================
+                                 TICKET RÉSOLU
+                            ====================================== -->
+
+                            {% elif selected_ticket.statut.value == "RESOLU" %}
+
+
+                                <div class="ticket-resolved-message">
+
+
+                                    <strong>
+                                        Ticket résolu
+                                    </strong>
+
+
+                                    <p>
+                                        Ce ticket a été marqué comme résolu.
+                                    </p>
+
+
+                                    {% if selected_ticket.solution_resolution %}
+
+                                        <div class="resolution-summary">
+
+                                            <strong>
+                                                Solution appliquée :
+                                            </strong>
+
+                                            <p>
+                                                {{ selected_ticket.solution_resolution }}
+                                            </p>
+
+                                        </div>
+
+                                    {% endif %}
+
+
+                                </div>
+
+
+                            <!-- =====================================
+                                 TICKET FERMÉ
+                            ====================================== -->
+
+                            {% elif selected_ticket.statut.value == "FERME" %}
+
+
+                                <div class="ticket-resolved-message">
+
+
+                                    <strong>
+                                        Ticket fermé
+                                    </strong>
+
+
+                                    <p>
+                                        Ce ticket est définitivement fermé.
+                                    </p>
+
+
+                                    {% if selected_ticket.solution_resolution %}
+
+                                        <div class="resolution-summary">
+
+                                            <strong>
+                                                Solution appliquée :
+                                            </strong>
+
+                                            <p>
+                                                {{ selected_ticket.solution_resolution }}
+                                            </p>
+
+                                        </div>
+
+                                    {% endif %}
+
+
+                                </div>
+
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                        <!-- =====================================
+                             ÉCHANGES AVEC LE DEMANDEUR
+                        ====================================== -->
+
+                        <div class="ticket-comments">
+
+
+                            <h3>
+                                Échanges avec le demandeur
+                            </h3>
+
+
+                            <div class="comments-list">
+
+
+                                {% if selected_ticket.commentaires %}
+
+
+                                    {% for commentaire in selected_ticket.commentaires %}
+
+
+                                        <div class="comment-item">
+
+
+                                            <div class="comment-header">
+
+
+                                                <div>
+
+
+                                                    <strong>
+                                                        {{ commentaire.auteur.nom }}
+                                                    </strong>
+
+
+                                                    {% if commentaire.auteur.role.value == "TECHNICIEN" %}
+
+                                                        <span class="comment-role">
+                                                            Technicien
+                                                        </span>
+
+                                                    {% elif commentaire.auteur.role.value == "USER" %}
+
+                                                        <span class="comment-role">
+                                                            Demandeur
+                                                        </span>
+
+                                                    {% elif commentaire.auteur.role.value == "ADMIN" %}
+
+                                                        <span class="comment-role">
+                                                            Administrateur
+                                                        </span>
+
+                                                    {% endif %}
+
+
+                                                </div>
+
+
+                                                <small>
+                                                    {{
+                                                        commentaire.date_creation.strftime(
+                                                            '%d/%m/%Y %H:%M'
+                                                        )
+                                                    }}
+                                                </small>
+
+
+                                            </div>
+
+
+                                            <p>
+                                                {{ commentaire.contenu }}
+                                            </p>
+
+
+                                        </div>
+
+
+                                    {% endfor %}
+
+
+                                {% else %}
+
+
+                                    <div class="empty-comments">
+
+                                        <p>
+                                            Aucun commentaire pour ce ticket.
+                                        </p>
+
+                                    </div>
+
+
+                                {% endif %}
+
+
+                            </div>
+
+
+                            <!-- =====================================
+                                 AJOUTER UNE RÉPONSE
+                            ====================================== -->
+
+                            {% if selected_ticket.statut.value != "FERME" %}
+
+
+                                <form
+                                    method="POST"
+                                    action="{{
+                                        url_for(
+                                            'ajouter_commentaire_technicien',
+                                            ticket_id=selected_ticket.id
+                                        )
+                                    }}"
+                                    class="comment-form"
+                                >
+
+
+                                    <label for="contenu">
+                                        Ajouter une réponse
+                                    </label>
+
+
+                                    <textarea
+                                        id="contenu"
+                                        name="contenu"
+                                        rows="4"
+                                        placeholder="Écrivez votre réponse au demandeur..."
+                                        required
+                                    ></textarea>
+
+
+                                    <button
+                                        type="submit"
+                                        class="action-button"
+                                    >
+                                        Envoyer la réponse
+                                    </button>
+
+
+                                </form>
+
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                        <!-- =====================================
+                             BOUTONS DU BAS
+                        ====================================== -->
+
+                        <div
+                            style="
+                                display: flex;
+                                gap: 10px;
+                                margin-top: 25px;
+                            "
+                        >
+
+
+                            
+
+
+                        </div>
+
 
                     </div>
 
 
-                {% endif %}
+                </div>
 
-            </div>
 
-        </section>
+            {% endif %}
 
-    </main>
+
+        {% endif %}
+
+            </main>
+
 
 </div>
+
+
+<!-- =========================================
+     JAVASCRIPT
+========================================= -->
+
+<script>
+
+    /* =========================================
+       CHOISIR UNE SOLUTION SUGGÉRÉE
+    ========================================= */
+
+    function choisirSolution(element) {
+
+        const solution =
+            element.dataset.solution;
+
+        const textarea =
+            document.getElementById(
+                "solution_resolution"
+            );
+
+        if (textarea) {
+
+            textarea.value = solution;
+
+            textarea.focus();
+
+        }
+
+    }
+
+</script>
+
 
 </body>
 
 </html>
-

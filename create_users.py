@@ -1,3 +1,5 @@
+import os
+
 from app import app
 from models import db, Utilisateur, RoleUtilisateur
 
@@ -9,7 +11,7 @@ with app.app_context():
             email="user@test.com",
             role=RoleUtilisateur.USER
         )
-        user.set_password("User123!")
+        user.set_password(os.environ["TEST_USER_PASSWORD"])
         db.session.add(user)
 
     if not Utilisateur.query.filter_by(email="tech@test.com").first():
@@ -18,7 +20,7 @@ with app.app_context():
             email="tech@test.com",
             role=RoleUtilisateur.TECHNICIEN
         )
-        technicien.set_password("Tech123!")
+        technicien.set_password(os.environ["TEST_TECH_PASSWORD"])
         db.session.add(technicien)
 
     if not Utilisateur.query.filter_by(email="admin@test.com").first():
@@ -27,7 +29,7 @@ with app.app_context():
             email="admin@test.com",
             role=RoleUtilisateur.ADMIN
         )
-        admin.set_password("Admin123!")
+        admin.set_password(os.environ["TEST_ADMIN_PASSWORD"])
         db.session.add(admin)
 
     db.session.commit()

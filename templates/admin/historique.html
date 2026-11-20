@@ -13,8 +13,7 @@
     >
 </head>
 
-<body class="admin-dashboard-page">
-
+<body class="admin-dashboard-page admin-page">
 <div class="app-shell">
 
     <!-- SIDEBAR -->
@@ -79,6 +78,10 @@
     Catégories
 </a>
 
+            <a href="{{ url_for('admin_statistiques') }}"
+   class="sidebar-item">
+    Statistiques
+</a>
         </div>
 
 
@@ -119,9 +122,17 @@
     <!-- CONTENU -->
     <main class="user-main">
 
-        <div class="dashboard-header">
+    
+
+
+ 
+
+       
+        <div class="admin-page-header">
 
             <h1>Historique</h1>
+
+            <div class="admin-title-line"></div>
 
             <p>
                 Consultez les actions effectuées sur les tickets.
@@ -175,9 +186,12 @@
 
                                     {% if historique.ticket %}
 
-                                        <strong>
-                                            Ticket #{{ historique.ticket.id }}
-                                        </strong>
+                                       <a
+    href="{{ url_for('admin_tickets', q=historique.ticket.id) }}"
+    class="history-ticket"
+>
+    Ticket #{{ historique.ticket.id }}
+</a>
 
                                         <span>
                                             {{ historique.ticket.titre }}

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Profil Technicien - Ticket Management</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body class="technician-page">
+
+<div class="app-shell">
+
+    <aside class="user-sidebar">
+
+        <div class="user-brand">
+
+            <div class="brand-mark">
+                TM
+            </div>
+
+            <div>
+                <strong>Ticket Management</strong>
+                <span>Helpdesk</span>
+            </div>
+
+        </div>
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                ESPACE TECHNICIEN
+            </span>
+
+            <a href="{{ url_for('dashboard_technicien') }}"
+               class="sidebar-item">
+                Tableau de bord
+            </a>
+
+           <a href="{{ url_for('tickets_technicien') }}"
+   class="sidebar-item">
+    Mes tickets
+</a>
+
+            <a href="{{ url_for('historique_technicien') }}"
+               class="sidebar-item">
+                Historique
+            </a>
+
+            <a href="{{ url_for('notifications_technicien') }}"
+               class="sidebar-item">
+                Notifications
+            </a>
+
+            <a href="{{ url_for('profil_technicien') }}"
+               class="sidebar-item active">
+                Mon profil
+            </a>
+
+        </div>
+
+        <div class="sidebar-bottom">
+
+            <span class="sidebar-user">
+                {{ current_user.nom }}
+            </span>
+
+            <span class="sidebar-role">
+                Technicien
+            </span>
+
+            <a href="{{ url_for('logout') }}"
+               class="sidebar-item">
+                Déconnexion
+            </a>
+
+        </div>
+
+    </aside>
+
+    <main class="user-main">
+
+        <div class="dashboard-header">
+
+            <div>
+
+                <span class="profile-small-label">
+                    COMPTE
+                </span>
+
+                <h1>
+                    Mon profil
+                </h1>
+                <div class="technician-title-line"></div>
+
+                <p>
+                    Modifiez vos informations personnelles et votre mot de passe.
+                </p>
+
+                
+
+            </div>
+
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="profile-success">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="profile-layout">
+
+            <aside class="profile-summary-card">
+
+                <div class="profile-big-avatar">
+                    {{ current_user.nom[0]|upper }}
+                </div>
+
+                <h2>
+                    {{ current_user.nom }}
+                </h2>
+
+                <p>
+                    {{ current_user.email }}
+                </p>
+
+                <span class="profile-role-badge">
+                    Technicien
+                </span>
+
+                <div class="profile-summary-info">
+
+                    <div>
+                        <span>Compte</span>
+                        <strong>Actif</strong>
+                    </div>
+
+                    <div>
+                        <span>Membre depuis</span>
+                        <strong>
+                            {{ current_user.date_creation.strftime('%d/%m/%Y') }}
+                        </strong>
+                    </div>
+
+                </div>
+
+            </aside>
+
+            <section class="profile-settings-card">
+
+                <div class="profile-section-header">
+
+                    <div>
+
+                        <span class="profile-small-label">
+                            PARAMÈTRES DU COMPTE
+                        </span>
+
+                        <h2>
+                            Informations personnelles
+                        </h2>
+
+                        <p>
+                            Gérez les informations associées à votre compte technicien.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <form
+                    method="POST"
+                    action="{{ url_for('profil_technicien') }}"
+                    class="modern-profile-form"
+                >
+
+                    <div class="profile-form-row">
+
+                        <div class="modern-field">
+
+                            <label for="nom">
+                                Nom complet
+                            </label>
+
+                            <input
+                                id="nom"
+                                type="text"
+                                name="nom"
+                                value="{{ current_user.nom }}"
+                                required
+                            >
+
+                        </div>
+
+                        <div class="modern-field">
+
+                            <label>
+                                Rôle
+                            </label>
+
+                            <input
+                                type="text"
+                                value="Technicien"
+                                disabled
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div class="modern-field">
+
+                        <label for="email">
+                            Adresse email
+                        </label>
+
+                        <input
+                            id="email"
+                            type="email"
+                            name="email"
+                            value="{{ current_user.email }}"
+                            required
+                        >
+
+                    </div>
+
+                    <div class="profile-security">
+
+                        <div class="security-title">
+
+                            <span>
+                                SÉCURITÉ
+                            </span>
+
+                            <h3>
+                                Mot de passe
+                            </h3>
+
+                            <p>
+                                Modifiez votre mot de passe uniquement si nécessaire.
+                            </p>
+
+                        </div>
+
+                        <div class="modern-field">
+
+                            <label for="nouveau_mot_de_passe">
+                                Nouveau mot de passe
+                            </label>
+
+                            <input
+                                id="nouveau_mot_de_passe"
+                                type="password"
+                                name="nouveau_mot_de_passe"
+                                placeholder="••••••••••••"
+                            >
+
+                            <small>
+                                Laissez ce champ vide pour conserver votre mot de passe actuel.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                    <div class="modern-profile-actions">
+
+                        <a
+                            href="{{ url_for('dashboard_technicien') }}"
+                            class="profile-cancel-btn"
+                        >
+                            Annuler
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="profile-save-btn"
+                        >
+                            Enregistrer les modifications
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

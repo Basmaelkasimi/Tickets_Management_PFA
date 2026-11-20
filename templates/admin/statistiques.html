@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Statistiques</title>
+
+    <!-- CSS GLOBAL DE L'APPLICATION -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <!-- CHART.JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        /* =========================================
+           PAGE STATISTIQUES
+        ========================================= */
+
+        .statistics-page {
+            padding: 32px;
+            width: 100%;
+        }
+
+
+        /* =========================================
+           HEADER
+        ========================================= */
+
+        .statistics-page-header {
+            margin-bottom: 28px;
+        }
+
+        .statistics-page-header h1 {
+            margin: 0;
+            font-size: 30px;
+            font-weight: 700;
+            color: #172554;
+        }
+
+        .statistics-title-line {
+            width: 64px;
+            height: 4px;
+            margin-top: 10px;
+            background: #2563eb;
+            border-radius: 20px;
+        }
+
+        .statistics-page-header p {
+            margin: 10px 0 0;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+
+        /* =========================================
+           CARTES KPI
+        ========================================= */
+
+        .statistics-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .statistics-kpi-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 22px;
+
+            box-shadow:
+                0 4px 14px rgba(15, 23, 42, 0.05);
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .statistics-kpi-card:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 8px 20px rgba(15, 23, 42, 0.08);
+        }
+
+        .statistics-kpi-label {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .statistics-kpi-value {
+            color: #172554;
+            font-size: 30px;
+            font-weight: 700;
+        }
+
+
+        /* COULEUR SUPÉRIEURE */
+
+        .statistics-kpi-card.total {
+            border-top: 4px solid #2563eb;
+        }
+
+        .statistics-kpi-card.new {
+            border-top: 4px solid #3b82f6;
+        }
+
+        .statistics-kpi-card.progress {
+            border-top: 4px solid #f59e0b;
+        }
+
+        .statistics-kpi-card.resolved {
+            border-top: 4px solid #22c55e;
+        }
+
+        .statistics-kpi-card.closed {
+            border-top: 4px solid #64748b;
+        }
+
+
+        /* =========================================
+           GRAPHIQUES
+        ========================================= */
+
+        .statistics-charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+            margin-bottom: 28px;
+        }
+
+        .statistics-chart-card {
+            background: #ffffff;
+
+            border:
+                1px solid #e2e8f0;
+
+            border-radius: 12px;
+
+            padding: 22px;
+
+            box-shadow:
+                0 4px 14px rgba(15, 23, 42, 0.05);
+        }
+
+        .statistics-chart-card h2 {
+            margin: 0 0 20px;
+            font-size: 18px;
+            color: #172554;
+        }
+
+        .statistics-chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+
+        /* =========================================
+           TABLEAU TECHNICIENS
+        ========================================= */
+
+        .statistics-table-card {
+            background: #ffffff;
+
+            border:
+                1px solid #e2e8f0;
+
+            border-radius: 12px;
+
+            padding: 22px;
+
+            box-shadow:
+                0 4px 14px rgba(15, 23, 42, 0.05);
+        }
+
+        .statistics-table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 20px;
+        }
+
+        .statistics-table-header h2 {
+            margin: 0;
+            color: #172554;
+            font-size: 18px;
+        }
+
+        .statistics-table-header span {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .statistics-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .statistics-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .statistics-table th {
+            background: #f8fafc;
+
+            color: #475569;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            text-align: left;
+
+            padding: 14px;
+
+            border-bottom:
+                1px solid #e2e8f0;
+        }
+
+        .statistics-table td {
+            padding: 15px 14px;
+
+            color: #334155;
+
+            font-size: 14px;
+
+            border-bottom:
+                1px solid #edf2f7;
+        }
+
+        .statistics-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+
+        /* =========================================
+           BADGES
+        ========================================= */
+
+        .statistics-badge {
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            min-width: 34px;
+
+            padding: 5px 10px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .statistics-badge.blue {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .statistics-badge.orange {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .statistics-badge.green {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+
+        /* =========================================
+           RESPONSIVE
+        ========================================= */
+
+        @media (max-width: 1200px) {
+
+            .statistics-kpi-grid {
+                grid-template-columns:
+                    repeat(3, 1fr);
+            }
+
+        }
+
+
+        @media (max-width: 950px) {
+
+            .statistics-charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .statistics-kpi-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .statistics-page {
+                padding: 18px;
+            }
+
+            .statistics-kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body class="admin-dashboard-page admin-page">
+
+<div class="app-shell">
+
+
+    <!-- ==================================================
+         SIDEBAR
+    =================================================== -->
+
+    <aside class="user-sidebar">
+
+
+        <!-- LOGO -->
+
+        <div class="user-brand">
+
+            <div class="brand-mark">
+                TM
+            </div>
+
+            <div>
+
+                <strong>
+                    Ticket Management
+                </strong>
+
+                <span>
+                    Helpdesk
+                </span>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= ADMINISTRATION ================= -->
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                ADMINISTRATION
+            </span>
+
+
+            <a
+                href="{{ url_for('dashboard_admin') }}"
+                class="sidebar-item"
+            >
+                Tableau de bord
+            </a>
+
+
+            <a
+                href="{{ url_for('admin_tickets') }}"
+                class="sidebar-item"
+            >
+                Tickets
+            </a>
+
+
+            <a
+                href="{{ url_for('admin_historique') }}"
+                class="sidebar-item"
+            >
+                Historique
+            </a>
+
+
+            <a
+                href="{{ url_for('admin_notifications') }}"
+                class="sidebar-item"
+            >
+                Notifications
+            </a>
+
+        </div>
+
+
+
+        <!-- ================= GESTION ================= -->
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                GESTION
+            </span>
+
+
+            <a
+                href="{{ url_for('admin_utilisateurs') }}"
+                class="sidebar-item"
+            >
+                Utilisateurs
+            </a>
+
+
+            <a
+                href="{{ url_for('admin_techniciens') }}"
+                class="sidebar-item"
+            >
+                Techniciens
+            </a>
+
+
+            <a
+                href="{{ url_for('admin_categories') }}"
+                class="sidebar-item"
+            >
+                Catégories
+            </a>
+
+
+            <!-- PAGE ACTIVE -->
+
+            <a
+                href="{{ url_for('admin_statistiques') }}"
+                class="sidebar-item active"
+            >
+                Statistiques
+            </a>
+
+        </div>
+
+
+
+        <!-- ================= COMPTE ================= -->
+
+        <div class="sidebar-section">
+
+            <span class="sidebar-title">
+                COMPTE
+            </span>
+
+
+            <a
+                href="{{ url_for('admin_profil') }}"
+                class="sidebar-item"
+            >
+                Profil
+            </a>
+
+        </div>
+
+
+
+        <!-- ================= UTILISATEUR ================= -->
+
+        <div class="sidebar-bottom">
+
+            <span class="sidebar-user">
+                {{ current_user.nom }}
+            </span>
+
+            <span class="sidebar-role">
+                Administrateur
+            </span>
+
+
+            <a
+                href="{{ url_for('logout') }}"
+                class="sidebar-item"
+            >
+                Déconnexion
+            </a>
+
+        </div>
+
+
+    </aside>
+
+
+
+    <!-- ==================================================
+         CONTENU PRINCIPAL
+    =================================================== -->
+
+    <main class="user-main">
+
+
+        <div class="statistics-page">
+
+
+            <!-- ================= HEADER ================= -->
+
+            <div class="statistics-page-header">
+
+                <h1>
+                    Statistiques
+                </h1>
+
+                <div class="statistics-title-line"></div>
+
+                <p>
+                    Vue globale de l'activité et des performances
+                    du système de gestion des tickets.
+                </p>
+
+            </div>
+
+
+
+            <!-- ==================================================
+                 KPI
+            =================================================== -->
+
+            <section class="statistics-kpi-grid">
+
+
+                <!-- TOTAL -->
+
+                <div class="statistics-kpi-card total">
+
+                    <div class="statistics-kpi-label">
+                        Total des tickets
+                    </div>
+
+                    <div class="statistics-kpi-value">
+                        {{ total_tickets }}
+                    </div>
+
+                </div>
+
+
+
+                <!-- NOUVEAUX -->
+
+                <div class="statistics-kpi-card new">
+
+                    <div class="statistics-kpi-label">
+                        Nouveaux
+                    </div>
+
+                    <div class="statistics-kpi-value">
+                        {{ tickets_nouveaux }}
+                    </div>
+
+                </div>
+
+
+
+                <!-- EN COURS -->
+
+                <div class="statistics-kpi-card progress">
+
+                    <div class="statistics-kpi-label">
+                        En cours
+                    </div>
+
+                    <div class="statistics-kpi-value">
+                        {{ tickets_en_cours }}
+                    </div>
+
+                </div>
+
+
+
+                <!-- RÉSOLUS -->
+
+                <div class="statistics-kpi-card resolved">
+
+                    <div class="statistics-kpi-label">
+                        Résolus
+                    </div>
+
+                    <div class="statistics-kpi-value">
+                        {{ tickets_resolus }}
+                    </div>
+
+                </div>
+
+
+
+                <!-- FERMÉS -->
+
+                <div class="statistics-kpi-card closed">
+
+                    <div class="statistics-kpi-label">
+                        Fermés
+                    </div>
+
+                    <div class="statistics-kpi-value">
+                        {{ tickets_fermes }}
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- ==================================================
+                 GRAPHIQUES
+            =================================================== -->
+
+            <section class="statistics-charts-grid">
+
+
+                <!-- ================= STATUT ================= -->
+
+                <div class="statistics-chart-card">
+
+                    <h2>
+                        Répartition par statut
+                    </h2>
+
+                    <div class="statistics-chart-container">
+
+                        <canvas id="statutChart"></canvas>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ================= PRIORITÉ ================= -->
+
+                <div class="statistics-chart-card">
+
+                    <h2>
+                        Répartition par priorité
+                    </h2>
+
+                    <div class="statistics-chart-container">
+
+                        <canvas id="prioriteChart"></canvas>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- ================= CATÉGORIE ================= -->
+
+                <div class="statistics-chart-card">
+
+                    <h2>
+                        Tickets par catégorie
+                    </h2>
+
+                    <div class="statistics-chart-container">
+
+                        <canvas id="categorieChart"></canvas>
+
+                    </div>
+
+                </div>
+
+<!-- ================= SERVICE ================= -->
+
+<div class="statistics-chart-card">
+
+    <h2>
+        Tickets par service
+    </h2>
+
+    <div class="statistics-chart-container">
+        <canvas id="serviceChart"></canvas>
+    </div>
+
+</div>
+
+                <!-- ================= TECHNICIEN ================= -->
+
+                <div class="statistics-chart-card">
+
+                    <h2>
+                        Activité par technicien
+                    </h2>
+
+                    <div class="statistics-chart-container">
+
+                        <canvas id="technicienChart"></canvas>
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- ==================================================
+                 TABLEAU TECHNICIENS
+            =================================================== -->
+
+            <section class="statistics-table-card">
+
+
+                <div class="statistics-table-header">
+
+                    <h2>
+                        Activité des techniciens
+                    </h2>
+
+                    <span>
+                        {{ statistiques_techniciens|length }}
+                        technicien(s)
+                    </span>
+
+                </div>
+
+
+                <div class="statistics-table-wrapper">
+
+
+                    <table class="statistics-table">
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Technicien
+                                </th>
+
+                                <th>
+                                    Total assigné
+                                </th>
+
+                                <th>
+                                    En cours
+                                </th>
+
+                                <th>
+                                    Résolus / Fermés
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+
+                        <tbody>
+
+
+                        {% for technicien in statistiques_techniciens %}
+
+
+                            <tr>
+
+
+                                <td>
+
+                                    <strong>
+                                        {{ technicien.nom }}
+                                    </strong>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="statistics-badge blue">
+
+                                        {{ technicien.total }}
+
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="statistics-badge orange">
+
+                                        {{ technicien.en_cours }}
+
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="statistics-badge green">
+
+                                        {{ technicien.resolus }}
+
+                                    </span>
+
+                                </td>
+
+
+                            </tr>
+
+
+                        {% else %}
+
+
+                            <tr>
+
+                                <td colspan="4">
+
+                                    Aucun technicien disponible.
+
+                                </td>
+
+                            </tr>
+
+
+                        {% endfor %}
+
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+            </section>
+
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- ==================================================
+     DONNÉES POUR LES GRAPHIQUES
+=================================================== -->
+
+<script>
+
+    /*
+    ================================================
+    DONNÉES PRIORITÉS
+    ================================================
+    */
+
+    const prioriteData =
+        {{ priorites | tojson }};
+
+
+    /*
+    ================================================
+    DONNÉES CATÉGORIES
+    ================================================
+    */
+
+    const categorieData =
+        {{ statistiques_categories | tojson }};
+
+
+        const serviceData =
+    {{ statistiques_services | tojson }};
+
+    /*
+    ================================================
+    DONNÉES TECHNICIENS
+    ================================================
+    */
+
+    const technicienLabels = [
+
+        {% for technicien in statistiques_techniciens %}
+
+            {{ technicien.nom | tojson }}
+
+            {% if not loop.last %}
+                ,
+            {% endif %}
+
+        {% endfor %}
+
+    ];
+
+
+    const technicienEnCours = [
+
+        {% for technicien in statistiques_techniciens %}
+
+            {{ technicien.en_cours }}
+
+            {% if not loop.last %}
+                ,
+            {% endif %}
+
+        {% endfor %}
+
+    ];
+
+
+    const technicienResolus = [
+
+        {% for technicien in statistiques_techniciens %}
+
+            {{ technicien.resolus }}
+
+            {% if not loop.last %}
+                ,
+            {% endif %}
+
+        {% endfor %}
+
+    ];
+
+
+
+    /*
+    ================================================
+    GRAPHIQUE STATUT
+    ================================================
+    */
+
+    new Chart(
+
+        document.getElementById("statutChart"),
+
+        {
+
+            type: "doughnut",
+
+            data: {
+
+                labels: [
+
+                    "Nouveau",
+                    "Assigné",
+                    "En cours",
+                    "En attente",
+                    "Résolu",
+                    "Fermé"
+
+                ],
+
+                datasets: [
+
+                    {
+
+                        data: [
+
+                            {{ tickets_nouveaux }},
+                            {{ tickets_assignes }},
+                            {{ tickets_en_cours }},
+                            {{ tickets_en_attente }},
+                            {{ tickets_resolus }},
+                            {{ tickets_fermes }}
+
+                        ],
+
+                        backgroundColor: [
+
+                            "#3b82f6",
+                            "#6366f1",
+                            "#f59e0b",
+                            "#f97316",
+                            "#22c55e",
+                            "#64748b"
+
+                        ],
+
+                        borderWidth: 0
+
+                    }
+
+                ]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+
+                        position: "bottom",
+
+                        labels: {
+
+                            padding: 18,
+
+                            usePointStyle: true
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+
+
+    /*
+    ================================================
+    GRAPHIQUE PRIORITÉ
+    ================================================
+    */
+
+    new Chart(
+
+        document.getElementById("prioriteChart"),
+
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels:
+                    Object.keys(prioriteData),
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "Nombre de tickets",
+
+                        data:
+                            Object.values(prioriteData),
+
+                        backgroundColor:
+                            "#2563eb",
+
+                        borderRadius:
+                            6
+
+                    }
+
+                ]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    }
+
+                },
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+
+                            precision: 0
+
+                        }
+
+                    },
+
+                    x: {
+
+                        grid: {
+                            display: false
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+
+
+    /*
+    ================================================
+    GRAPHIQUE CATÉGORIE
+    ================================================
+    */
+
+    new Chart(
+
+        document.getElementById("categorieChart"),
+
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels:
+                    Object.keys(categorieData),
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "Nombre de tickets",
+
+                        data:
+                            Object.values(categorieData),
+
+                        backgroundColor:
+                            "#3b82f6",
+
+                        borderRadius:
+                            6
+
+                    }
+
+                ]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    }
+
+                },
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+
+                            precision: 0
+
+                        }
+
+                    },
+
+                    x: {
+
+                        grid: {
+                            display: false
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+
+
+    
+
+
+
+    /*
+    ================================================
+    GRAPHIQUE TECHNICIENS
+    ================================================
+    */
+
+    new Chart(
+
+        document.getElementById("technicienChart"),
+
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels:
+                    technicienLabels,
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "En cours",
+
+                        data:
+                            technicienEnCours,
+
+                        backgroundColor:
+                            "#f59e0b",
+
+                        borderRadius:
+                            6
+
+                    },
+
+
+                    {
+
+                        label:
+                            "Résolus / Fermés",
+
+                        data:
+                            technicienResolus,
+
+                        backgroundColor:
+                            "#22c55e",
+
+                        borderRadius:
+                            6
+
+                    }
+
+                ]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+
+                        position:
+                            "bottom"
+
+                    }
+
+                },
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+
+                            precision: 0
+
+                        }
+
+                    },
+
+                    x: {
+
+                        grid: {
+                            display: false
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+
+
+/*
+===============================================
+GRAPHIQUE SERVICE
+===============================================
+*/
+
+new Chart(
+    document.getElementById("serviceChart"),
+    {
+        type: "bar",
+
+        data: {
+            labels: Object.keys(serviceData),
+
+            datasets: [
+                {
+                    label: "Nombre de tickets",
+                    data: Object.values(serviceData),
+                    backgroundColor: "#2563eb",
+                    borderRadius: 6
+                }
+            ]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                },
+
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    }
+);
+</script>
+
+
+</body>
+
+</html>

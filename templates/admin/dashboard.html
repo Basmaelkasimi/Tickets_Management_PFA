@@ -11,10 +11,106 @@
         rel="stylesheet"
         href="{{ url_for('static', filename='css/style.css') }}"
     >
+
+
+
+ <style>
+
+.admin-kpi-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 18px !important;
+    margin-bottom: 28px !important;
+}
+
+.admin-kpi-card {
+    display: block !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 22px !important;
+    min-height: 112px !important;
+
+    box-shadow:
+        0 4px 14px rgba(15, 23, 42, 0.05) !important;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease !important;
+}
+
+.admin-kpi-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 20px rgba(15, 23, 42, 0.08) !important;
+}
+
+
+/* TEXTE */
+
+.admin-kpi-label {
+    display: block !important;
+    margin-bottom: 12px !important;
+
+    color: #64748b !important;
+
+    font-size: 14px !important;
+    font-weight: 400 !important;
+}
+
+.admin-kpi-value {
+    display: block !important;
+
+    color: #172554 !important;
+
+    font-size: 30px !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+}
+
+
+/* LIGNES COLORÉES */
+
+.admin-kpi-total {
+    border-top: 4px solid #2563eb !important;
+}
+
+.admin-kpi-new {
+    border-top: 4px solid #3b82f6 !important;
+}
+
+.admin-kpi-progress {
+    border-top: 4px solid #f59e0b !important;
+}
+
+.admin-kpi-resolved {
+    border-top: 4px solid #22c55e !important;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+
+    .admin-kpi-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .admin-kpi-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+}
+
+</style>
 </head>
 
-<body class="admin-dashboard-page">
-
+<body class="admin-dashboard-page admin-page">
 <div class="app-shell">
 
     <!-- SIDEBAR -->
@@ -87,6 +183,11 @@
    class="sidebar-item">
     Catégories
 </a>
+
+            <a href="{{ url_for('admin_statistiques') }}"
+   class="sidebar-item">
+    Statistiques
+</a>
         </div>
 
 
@@ -129,13 +230,30 @@
     <main class="user-main">
 
         <!-- HEADER -->
-        <div class="dashboard-header">
+
+        <a href="{{ url_for('admin_profil') }}"
+   class="admin-header-profile">
+
+    <div class="admin-header-profile-info">
+        <strong>{{ current_user.nom }}</strong>
+        <span>Administrateur</span>
+    </div>
+
+    <div class="admin-header-avatar">
+        {{ current_user.nom[0]|upper }}
+    </div>
+
+</a>
+       
+        <div class="admin-page-header">
 
             <div>
 
                 <h1>
                     Tableau de bord administrateur
                 </h1>
+
+                <div class="admin-title-line"></div>
 
                 <p>
                     Bienvenue {{ current_user.nom }},
@@ -145,6 +263,16 @@
             </div>
 
         </div>
+
+
+
+   
+
+    
+
+  
+
+
 
 
         <!-- MESSAGES FLASH -->
@@ -169,63 +297,69 @@
         {% endwith %}
 
 
-        <!-- STATISTIQUES -->
-        <section class="stats-grid">
-
-            <div class="stat-card">
-
-                <span>
-                    Total tickets
-                </span>
-
-                <strong>
-                    {{ total_tickets }}
-                </strong>
-
-            </div>
 
 
-            <div class="stat-card">
+        <!-- FILTRE PAR DATE -->
+<form method="GET"
+      action="{{ url_for('dashboard_admin') }}"
+      class="admin-date-filter">
 
-                <span>
-                    Nouveaux
-                </span>
+    <div class="date-filter-field">
+        <label for="date_debut">Du</label>
+        <input
+            type="date"
+            id="date_debut"
+            name="date_debut"
+            value="{{ request.args.get('date_debut', '') }}"
+        >
+    </div>
 
-                <strong>
-                    {{ tickets_nouveaux }}
-                </strong>
+    <div class="date-filter-field">
+        <label for="date_fin">Au</label>
+        <input
+            type="date"
+            id="date_fin"
+            name="date_fin"
+            value="{{ request.args.get('date_fin', '') }}"
+        >
+    </div>
 
-            </div>
+    <button type="submit" class="date-filter-btn">
+        Filtrer
+    </button>
 
+    {% if request.args.get('date_debut') or request.args.get('date_fin') %}
+        <a href="{{ url_for('dashboard_admin') }}"
+           class="date-reset-btn">
+            Réinitialiser
+        </a>
+    {% endif %}
 
-            <div class="stat-card">
+</form>
+<!-- STATISTIQUES -->
+<section class="admin-kpi-grid">
 
-                <span>
-                    En cours
-                </span>
+    <div class="admin-kpi-card admin-kpi-total">
+        <span class="admin-kpi-label">Total tickets</span>
+        <strong class="admin-kpi-value">{{ total_tickets }}</strong>
+    </div>
 
-                <strong>
-                    {{ tickets_en_cours }}
-                </strong>
+    <div class="admin-kpi-card admin-kpi-new">
+        <span class="admin-kpi-label">Nouveaux</span>
+        <strong class="admin-kpi-value">{{ tickets_nouveaux }}</strong>
+    </div>
 
-            </div>
+    <div class="admin-kpi-card admin-kpi-progress">
+        <span class="admin-kpi-label">En cours</span>
+        <strong class="admin-kpi-value">{{ tickets_en_cours }}</strong>
+    </div>
 
+    <div class="admin-kpi-card admin-kpi-resolved">
+        <span class="admin-kpi-label">Résolus</span>
+        <strong class="admin-kpi-value">{{ tickets_resolus }}</strong>
+    </div>
 
-            <div class="stat-card">
-
-                <span>
-                    Résolus
-                </span>
-
-                <strong>
-                    {{ tickets_resolus }}
-                </strong>
-
-            </div>
-
-        </section>
-
-
+</section>
         <!-- ZONE PRINCIPALE -->
         <section class="admin-dashboard-grid">
 

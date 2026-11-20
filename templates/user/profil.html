@@ -13,16 +13,20 @@
     >
 </head>
 
-<body class="user-dashboard-page">
+<body class="user-dashboard-page user-page">
 
 <div class="app-shell">
 
-    <!-- SIDEBAR -->
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
     <aside class="user-sidebar">
 
         <div class="user-brand">
 
-            <div class="brand-mark">TM</div>
+            <div class="brand-mark">
+                TM
+            </div>
 
             <div>
                 <strong>Ticket Management</strong>
@@ -39,15 +43,18 @@
                 ESPACE UTILISATEUR
             </span>
 
-            <a href="{{ url_for('dashboard_user') }}" class="sidebar-item">
+            <a href="{{ url_for('dashboard_user') }}"
+               class="sidebar-item">
                 Tableau de bord
             </a>
 
-            <a href="{{ url_for('dashboard_user') }}" class="sidebar-item">
+            <a href="{{ url_for('tickets_user') }}"
+               class="sidebar-item">
                 Mes tickets
             </a>
 
-            <a href="{{ url_for('creer_ticket') }}" class="sidebar-item">
+            <a href="{{ url_for('creer_ticket') }}"
+               class="sidebar-item">
                 Nouveau ticket
             </a>
 
@@ -130,17 +137,22 @@
     </aside>
 
 
-    <!-- CONTENU -->
-    <main class="user-content">
+    <!-- =====================================================
+         CONTENU
+    ====================================================== -->
+    <main class="user-content user-profile-page">
+
 
         <!-- TOPBAR -->
         <div class="user-topbar">
 
             <div class="search-box">
 
-                <form method="GET"
-                      action="{{ url_for('dashboard_user') }}"
-                      class="search-form">
+                <form
+                    method="GET"
+                    action="{{ url_for('dashboard_user') }}"
+                    class="search-form"
+                >
 
                     <input
                         type="text"
@@ -152,6 +164,7 @@
 
             </div>
 
+
             <div class="topbar-right">
 
                 <div class="notification-circle">
@@ -159,8 +172,15 @@
                 </div>
 
                 <div class="top-user">
-                    <strong>{{ current_user.nom }}</strong>
-                    <span>Utilisateur</span>
+
+                    <strong>
+                        {{ current_user.nom }}
+                    </strong>
+
+                    <span>
+                        Utilisateur
+                    </span>
+
                 </div>
 
             </div>
@@ -168,8 +188,10 @@
         </div>
 
 
-        <!-- INTRO -->
-        <section class="dashboard-intro">
+        <!-- =================================================
+             TITRE
+        ================================================== -->
+        <section class="dashboard-intro user-profile-intro">
 
             <div>
 
@@ -181,6 +203,9 @@
                     Mon profil
                 </h1>
 
+                <!-- PETITE LIGNE -->
+                <div class="user-title-line"></div>
+
                 <p>
                     Consultez et modifiez vos informations personnelles.
                 </p>
@@ -190,170 +215,233 @@
         </section>
 
 
-        <!-- FORMULAIRE PROFIL -->
-    <div class="profile-layout">
-
-    <!-- CARTE IDENTITE -->
-    <aside class="profile-summary-card">
-
-        <div class="profile-big-avatar">
-            {{ current_user.nom[0]|upper }}
-        </div>
-
-        <h2>{{ current_user.nom }}</h2>
-        <p>{{ current_user.email }}</p>
-
-        <span class="profile-role-badge">
-            Utilisateur
-        </span>
-
-        <div class="profile-summary-info">
-
-            <div>
-                <span>Compte</span>
-                <strong>Actif</strong>
-            </div>
-
-            <div>
-                <span>Membre depuis</span>
-                <strong>
-                    {{ current_user.date_creation.strftime('%d/%m/%Y') }}
-                </strong>
-            </div>
-
-        </div>
-
-    </aside>
-
-
-    <!-- INFORMATIONS -->
-    <section class="profile-settings-card">
-
-        <div class="profile-section-header">
-            <div>
-                <span class="profile-small-label">PARAMÈTRES DU COMPTE</span>
-                <h2>Informations personnelles</h2>
-                <p>
-                    Gérez les informations associées à votre compte.
-                </p>
-            </div>
-        </div>
-
-
         <!-- FLASH -->
         {% with messages = get_flashed_messages() %}
+
             {% if messages %}
+
                 {% for message in messages %}
+
                     <div class="profile-success">
                         {{ message }}
                     </div>
+
                 {% endfor %}
+
             {% endif %}
+
         {% endwith %}
 
 
-        <form method="POST"
-              action="{{ url_for('profil_user') }}"
-              class="modern-profile-form">
+        <!-- =================================================
+             PROFIL
+        ================================================== -->
+        <div class="profile-layout">
 
-            <div class="profile-form-row">
 
-                <div class="modern-field">
-                    <label for="nom">Nom complet</label>
+            <!-- =============================================
+                 CARTE GAUCHE
+            ============================================== -->
+            <aside class="profile-summary-card">
 
-                    <input
-                        id="nom"
-                        type="text"
-                        name="nom"
-                        value="{{ current_user.nom }}"
-                        required
-                    >
+                <div class="profile-big-avatar">
+                    {{ current_user.nom[0]|upper }}
                 </div>
 
-                <div class="modern-field">
-                    <label>Rôle</label>
+                <h2>
+                    {{ current_user.nom }}
+                </h2>
 
-                    <input
-                        type="text"
-                        value="Utilisateur"
-                        disabled
-                    >
+                <p>
+                    {{ current_user.email }}
+                </p>
+
+                <span class="profile-role-badge">
+                    Utilisateur
+                </span>
+
+
+                <div class="profile-summary-info">
+
+                    <div>
+                        <span>Compte</span>
+                        <strong class="user-account-active">
+                            Actif
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>Membre depuis</span>
+
+                        <strong>
+                            {{ current_user.date_creation.strftime('%d/%m/%Y') }}
+                        </strong>
+                    </div>
+
                 </div>
 
-            </div>
+            </aside>
 
 
-            <div class="modern-field">
+            <!-- =============================================
+                 CARTE DROITE
+            ============================================== -->
+            <section class="profile-settings-card">
 
-                <label for="email">
-                    Adresse email
-                </label>
+                <div class="profile-section-header">
 
-                <input
-                    id="email"
-                    type="email"
-                    name="email"
-                    value="{{ current_user.email }}"
-                    required
+                    <div>
+
+                        <span class="profile-small-label">
+                            PARAMÈTRES DU COMPTE
+                        </span>
+
+                        <h2>
+                            Informations personnelles
+                        </h2>
+
+                        <p>
+                            Gérez les informations associées à votre compte.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for('profil_user') }}"
+                    class="modern-profile-form"
                 >
 
-            </div>
+
+                    <!-- NOM + ROLE -->
+                    <div class="profile-form-row">
 
 
-            <!-- SECURITE -->
-            <div class="profile-security">
+                        <div class="modern-field">
 
-                <div class="security-title">
-                    <span>SÉCURITÉ</span>
-                    <h3>Mot de passe</h3>
-                    <p>
-                        Modifiez votre mot de passe uniquement si nécessaire.
-                    </p>
-                </div>
+                            <label for="nom">
+                                Nom complet
+                            </label>
 
-                <div class="modern-field">
+                            <input
+                                id="nom"
+                                type="text"
+                                name="nom"
+                                value="{{ current_user.nom }}"
+                                required
+                            >
 
-                    <label for="nouveau_mot_de_passe">
-                        Nouveau mot de passe
-                    </label>
-
-                    <input
-                        id="nouveau_mot_de_passe"
-                        type="password"
-                        name="nouveau_mot_de_passe"
-                        placeholder="••••••••••••"
-                    >
-
-                    <small>
-                        Laissez ce champ vide pour conserver votre mot de passe actuel.
-                    </small>
-
-                </div>
-
-            </div>
+                        </div>
 
 
-            <div class="modern-profile-actions">
+                        <div class="modern-field">
 
-                <a href="{{ url_for('dashboard_user') }}"
-                   class="profile-cancel-btn">
-                    Annuler
-                </a>
+                            <label>
+                                Rôle
+                            </label>
 
-                <button type="submit"
-                        class="profile-save-btn">
-                    Enregistrer les modifications
-                </button>
+                            <input
+                                type="text"
+                                value="Utilisateur"
+                                disabled
+                            >
 
-            </div>
+                        </div>
 
-        </form>
+                    </div>
 
-    </section>
 
-</div>
+                    <!-- EMAIL -->
+                    <div class="modern-field">
 
-        </section>
+                        <label for="email">
+                            Adresse email
+                        </label>
+
+                        <input
+                            id="email"
+                            type="email"
+                            name="email"
+                            value="{{ current_user.email }}"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- =====================================
+                         SECURITE
+                    ====================================== -->
+                    <div class="profile-security">
+
+                        <div class="security-title">
+
+                            <span>
+                                SÉCURITÉ
+                            </span>
+
+                            <h3>
+                                Mot de passe
+                            </h3>
+
+                            <p>
+                                Modifiez votre mot de passe uniquement si nécessaire.
+                            </p>
+
+                        </div>
+
+
+                        <div class="modern-field">
+
+                            <label for="nouveau_mot_de_passe">
+                                Nouveau mot de passe
+                            </label>
+
+                            <input
+                                id="nouveau_mot_de_passe"
+                                type="password"
+                                name="nouveau_mot_de_passe"
+                                placeholder="••••••••••••"
+                            >
+
+                            <small>
+                                Laissez ce champ vide pour conserver votre mot de passe actuel.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =====================================
+                         ACTIONS
+                    ====================================== -->
+                    <div class="modern-profile-actions">
+
+                        <a
+                            href="{{ url_for('dashboard_user') }}"
+                            class="profile-cancel-btn"
+                        >
+                            Annuler
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="profile-save-btn"
+                        >
+                            Enregistrer les modifications
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+        </div>
 
     </main>
 

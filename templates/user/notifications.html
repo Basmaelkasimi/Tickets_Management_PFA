@@ -13,8 +13,7 @@
     >
 </head>
 
-<body class="user-dashboard-page">
-
+<body class="user-dashboard-page user-page">
 <div class="app-shell">
 
     <aside class="user-sidebar">
@@ -38,9 +37,10 @@
                 Tableau de bord
             </a>
 
-            <a href="{{ url_for('dashboard_user') }}" class="sidebar-item">
-                Mes tickets
-            </a>
+           <a href="{{ url_for('tickets_user') }}"
+   class="sidebar-item">
+    Mes tickets
+</a>
 
             <a href="{{ url_for('creer_ticket') }}" class="sidebar-item">
                 Nouveau ticket

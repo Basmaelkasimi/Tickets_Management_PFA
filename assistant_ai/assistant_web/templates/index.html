@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DevOps AI Assistant</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+<div class="container">
+
+    <header class="header">
+        <p class="subtitle">
+            PFA - Infrastructure DevOps intelligente
+        </p>
+
+        <h1>DevOps AI Assistant</h1>
+
+        <p class="description">
+            Générez vos configurations DevOps et analysez vos erreurs
+            avec l'assistance de Gemini.
+        </p>
+    </header>
+
+
+    <main class="layout">
+
+        <!-- ========================= -->
+        <!-- PANEL CONFIGURATION -->
+        <!-- ========================= -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+                <h2>Configuration</h2>
+                <p>
+                    Sélectionnez une fonctionnalité et renseignez
+                    les informations nécessaires.
+                </p>
+            </div>
+
+
+            <form method="POST" id="assistant-form">
+
+                <div class="field">
+
+                    <label for="tool">
+                        Fonction
+                    </label>
+
+                    <select
+                        name="tool"
+                        id="tool"
+                        onchange="updateForm()"
+                    >
+
+                        <option
+                            value="dockerfile"
+                            {% if selected_tool == "dockerfile" %}
+                            selected
+                            {% endif %}
+                        >
+                            Générer un Dockerfile
+                        </option>
+
+                        <option
+                            value="compose"
+                            {% if selected_tool == "compose" %}
+                            selected
+                            {% endif %}
+                        >
+                            Générer Docker Compose
+                        </option>
+
+                        <option
+                            value="gitlab"
+                            {% if selected_tool == "gitlab" %}
+                            selected
+                            {% endif %}
+                        >
+                            Générer GitLab CI/CD
+                        </option>
+
+                        <option
+                            value="diagnostic"
+                            {% if selected_tool == "diagnostic" %}
+                            selected
+                            {% endif %}
+                        >
+                            Analyser une erreur
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- ========================= -->
+                <!-- DOCKERFILE -->
+                <!-- ========================= -->
+
+                <div id="dockerfile-fields" class="tool-fields">
+
+                    <div class="field">
+                        <label>Langage</label>
+
+                        <input
+                            type="text"
+                            name="language"
+                            value="Python"
+                        >
+                    </div>
+
+
+                    <div class="field">
+                        <label>Framework</label>
+
+                        <input
+                            type="text"
+                            name="framework"
+                            value="Flask"
+                        >
+                    </div>
+
+
+                    <div class="field">
+                        <label>Port</label>
+
+                        <input
+                            type="number"
+                            name="port"
+                            value="5000"
+                        >
+                    </div>
+
+
+                    <div class="field">
+                        <label>Fichier des dépendances</label>
+
+                        <input
+                            type="text"
+                            name="requirements"
+                            value="requirements.txt"
+                        >
+                    </div>
+
+                </div>
+
+
+                <!-- ========================= -->
+                <!-- DOCKER COMPOSE -->
+                <!-- ========================= -->
+
+                <div id="compose-fields" class="tool-fields">
+
+                    <div class="field">
+                        <label>Nom de l'application</label>
+
+                        <input
+                            type="text"
+                            name="app_name"
+                            value="devops-app"
+                        >
+                    </div>
+
+
+                    <div class="field">
+                        <label>Port hôte</label>
+
+                        <input
+                            type="number"
+                            name="host_port"
+                            value="5000"
+                        >
+                    </div>
+
+
+                    <div class="field">
+                        <label>Port conteneur</label>
+
+                        <input
+                            type="number"
+                            name="container_port"
+                            value="5000"
+                        >
+                    </div>
+
+                </div>
+
+
+                <!-- ========================= -->
+                <!-- GITLAB CI -->
+                <!-- ========================= -->
+
+                <div id="gitlab-fields" class="tool-fields">
+
+                    <div class="field">
+                        <label>Langage</label>
+
+                        <input
+                            type="text"
+                            name="language"
+                            value="Python"
+                        >
+                    </div>
+
+
+                    <div class="field">
+                        <label>Framework</label>
+
+                        <input
+                            type="text"
+                            name="framework"
+                            value="Flask"
+                        >
+                    </div>
+
+
+                    <div class="field">
+                        <label>Image Docker</label>
+
+                        <input
+                            type="text"
+                            name="image_name"
+                            value="devops-app"
+                        >
+                    </div>
+
+
+                    <div class="field">
+                        <label>Deployment Kubernetes</label>
+
+                        <input
+                            type="text"
+                            name="deployment"
+                            value="app-deployment"
+                        >
+                    </div>
+
+
+                    <div class="field">
+                        <label>Conteneur Kubernetes</label>
+
+                        <input
+                            type="text"
+                            name="container"
+                            value="app-container"
+                        >
+                    </div>
+
+                </div>
+
+
+                <!-- ========================= -->
+                <!-- DIAGNOSTIC -->
+                <!-- ========================= -->
+
+                <div id="diagnostic-fields" class="tool-fields">
+
+                    <div class="field">
+
+                        <label>
+                            Message d'erreur
+                        </label>
+
+                        <textarea
+                            name="error_message"
+                            rows="10"
+                            placeholder="Collez ici votre erreur Docker, GitLab CI/CD ou Kubernetes..."
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                    id="submit-btn"
+                >
+                    Générer avec Gemini
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- RESULT PANEL -->
+        <!-- ========================= -->
+
+        <section class="panel result-panel">
+
+            <div class="result-header">
+
+                <div>
+                    <h2>Résultat</h2>
+
+                    <p>
+                        Réponse générée par l'assistant.
+                    </p>
+                </div>
+
+
+                {% if result %}
+
+                <div class="result-actions">
+
+                    <button
+                        type="button"
+                        class="secondary-btn"
+                        onclick="copyResult()"
+                    >
+                        Copier
+                    </button>
+
+                    <button
+                        type="button"
+                        class="secondary-btn"
+                        onclick="downloadResult()"
+                    >
+                        Télécharger
+                    </button>
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            {% if result %}
+
+                <pre id="result-content">{{ result }}</pre>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <h3>Aucun résultat</h3>
+
+                    <p>
+                        Sélectionnez une fonctionnalité puis
+                        lancez l'assistant.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script>
+
+function updateForm() {
+
+    const tool = document.getElementById("tool").value;
+
+    const sections = document.querySelectorAll(".tool-fields");
+
+    sections.forEach(section => {
+        section.style.display = "none";
+    });
+
+
+    if (tool === "dockerfile") {
+
+        document.getElementById(
+            "dockerfile-fields"
+        ).style.display = "block";
+
+        document.getElementById(
+            "submit-btn"
+        ).textContent = "Générer le Dockerfile";
+
+    }
+
+
+    else if (tool === "compose") {
+
+        document.getElementById(
+            "compose-fields"
+        ).style.display = "block";
+
+        document.getElementById(
+            "submit-btn"
+        ).textContent = "Générer Docker Compose";
+
+    }
+
+
+    else if (tool === "gitlab") {
+
+        document.getElementById(
+            "gitlab-fields"
+        ).style.display = "block";
+
+        document.getElementById(
+            "submit-btn"
+        ).textContent = "Générer GitLab CI/CD";
+
+    }
+
+
+    else if (tool === "diagnostic") {
+
+        document.getElementById(
+            "diagnostic-fields"
+        ).style.display = "block";
+
+        document.getElementById(
+            "submit-btn"
+        ).textContent = "Analyser l'erreur";
+
+    }
+
+}
+
+
+function copyResult() {
+
+    const result = document.getElementById(
+        "result-content"
+    ).innerText;
+
+    navigator.clipboard.writeText(result);
+
+    alert("Résultat copié.");
+
+}
+
+
+function downloadResult() {
+
+    const tool = document.getElementById("tool").value;
+
+    const result = document.getElementById(
+        "result-content"
+    ).innerText;
+
+
+    let filename = "result.txt";
+
+
+    if (tool === "dockerfile") {
+        filename = "Dockerfile.generated";
+    }
+
+    else if (tool === "compose") {
+        filename = "docker-compose.generated.yml";
+    }
+
+    else if (tool === "gitlab") {
+        filename = "gitlab-ci.generated.yml";
+    }
+
+    else if (tool === "diagnostic") {
+        filename = "diagnostic.txt";
+    }
+
+
+    const blob = new Blob(
+        [result],
+        {
+            type: "text/plain"
+        }
+    );
+
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+
+    link.href = url;
+
+    link.download = filename;
+
+    link.click();
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    updateForm
+);
+
+</script>
+
+</body>
+</html>

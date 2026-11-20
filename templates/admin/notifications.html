@@ -13,8 +13,7 @@
     >
 </head>
 
-<body class="admin-dashboard-page">
-
+<body class="admin-dashboard-page admin-page">
 <div class="app-shell">
 
     <!-- SIDEBAR -->
@@ -80,6 +79,11 @@
     Catégories
 </a>
 
+            <a href="{{ url_for('admin_statistiques') }}"
+   class="sidebar-item">
+    Statistiques
+</a>
+
         </div>
 
 
@@ -117,12 +121,18 @@
     </aside>
 
 
+
+
+    
+
     <!-- CONTENU -->
     <main class="user-main">
 
-        <div class="dashboard-header">
+       <div class="admin-page-header">
 
             <h1>Notifications</h1>
+
+             <div class="admin-title-line"></div>
 
             <p>
                 Consultez les notifications liées à l'activité de la plateforme.

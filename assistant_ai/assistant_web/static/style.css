@@ -1,0 +1,371 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family:
+        Inter,
+        Arial,
+        sans-serif;
+
+    background: #f4f6f8;
+    color: #172033;
+}
+
+.container {
+    width: 92%;
+    max-width: 1350px;
+    margin: 45px auto;
+}
+
+
+/* HEADER */
+
+.header {
+    margin-bottom: 32px;
+}
+
+.subtitle {
+    margin: 0 0 8px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+
+    color: #64748b;
+}
+
+.header h1 {
+    margin: 0;
+
+    font-size: 38px;
+    font-weight: 700;
+}
+
+.description {
+    margin-top: 10px;
+
+    font-size: 16px;
+
+    color: #64748b;
+}
+
+
+/* MAIN LAYOUT */
+
+.layout {
+    display: grid;
+
+    grid-template-columns:
+        minmax(350px, 0.9fr)
+        minmax(450px, 1.3fr);
+
+    gap: 25px;
+
+    align-items: start;
+}
+
+
+/* PANEL */
+
+.panel {
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    padding: 26px;
+
+    box-shadow:
+        0 4px 20px
+        rgba(15, 23, 42, 0.05);
+}
+
+.panel-header {
+    margin-bottom: 25px;
+}
+
+.panel-header h2,
+.result-header h2 {
+    margin: 0;
+
+    font-size: 21px;
+}
+
+.panel-header p,
+.result-header p {
+    margin:
+        7px
+        0
+        0;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+/* FORM */
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.tool-fields {
+    display: none;
+}
+
+.field {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+    margin-bottom: 15px;
+}
+
+label {
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #334155;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 8px;
+
+    padding:
+        11px
+        12px;
+
+    font-size: 14px;
+
+    color: #172033;
+
+    background: white;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #64748b;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(100, 116, 139, 0.12);
+}
+
+textarea {
+    resize: vertical;
+
+    min-height: 190px;
+}
+
+
+/* BUTTONS */
+
+button {
+    font-family: inherit;
+}
+
+.primary-btn {
+    width: 100%;
+
+    border: none;
+
+    border-radius: 8px;
+
+    padding:
+        13px
+        18px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    background: #172033;
+
+    color: white;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.15s,
+        opacity 0.15s;
+}
+
+.primary-btn:hover {
+    opacity: 0.92;
+}
+
+.primary-btn:active {
+    transform: scale(0.99);
+}
+
+
+/* RESULT */
+
+.result-panel {
+    min-height: 600px;
+}
+
+.result-header {
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 20px;
+}
+
+.result-actions {
+    display: flex;
+
+    gap: 8px;
+}
+
+.secondary-btn {
+    background: white;
+
+    border: 1px solid #cbd5e1;
+
+    color: #334155;
+
+    border-radius: 7px;
+
+    padding:
+        8px
+        12px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.secondary-btn:hover {
+    background: #f8fafc;
+}
+
+
+/* CODE RESULT */
+
+pre {
+    margin: 0;
+
+    min-height: 500px;
+
+    max-height: 650px;
+
+    overflow: auto;
+
+    padding: 22px;
+
+    border-radius: 10px;
+
+    background: #111827;
+
+    color: #f8fafc;
+
+    font-family:
+        Consolas,
+        Monaco,
+        monospace;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+
+    white-space: pre-wrap;
+
+    word-break: break-word;
+}
+
+
+/* EMPTY RESULT */
+
+.empty-state {
+    min-height: 500px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    border:
+        1px
+        dashed
+        #cbd5e1;
+
+    border-radius: 10px;
+
+    background: #fafafa;
+
+    color: #64748b;
+}
+
+.empty-state h3 {
+    margin: 0 0 7px;
+
+    color: #334155;
+
+    font-size: 16px;
+}
+
+.empty-state p {
+    margin: 0;
+
+    font-size: 13px;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 950px) {
+
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        width: 94%;
+
+        margin:
+            25px
+            auto;
+    }
+
+    .header h1 {
+        font-size: 30px;
+    }
+
+}

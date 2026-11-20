@@ -11,10 +11,118 @@
         rel="stylesheet"
         href="{{ url_for('static', filename='css/style.css') }}"
     >
+
+
+
+
+
+
+    <style>
+
+.user-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.user-kpi-card {
+    display: block;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 22px;
+    min-height: 130px;
+
+    box-shadow:
+        0 4px 14px rgba(15, 23, 42, 0.05);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.user-kpi-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.user-kpi-label {
+    display: block;
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.user-kpi-value {
+    display: block;
+    color: #172554;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 10px;
+}
+
+.user-kpi-card small {
+    display: block;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+
+/* TOTAL */
+
+.user-kpi-total {
+    border-top: 4px solid #2563eb;
+}
+
+
+/* OUVERTS */
+
+.user-kpi-progress {
+    border-top: 4px solid #3b82f6;
+}
+
+
+/* ATTENTE */
+
+.user-kpi-waiting {
+    border-top: 4px solid #f59e0b;
+}
+
+
+/* RESOLUS */
+
+.user-kpi-resolved {
+    border-top: 4px solid #22c55e;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+
+    .user-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .user-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+</style>
 </head>
 
 
-<body class="user-dashboard-page">
+<body class="user-dashboard-page user-page">
 
 <div class="app-shell">
 
@@ -49,9 +157,10 @@
         Tableau de bord
     </a>
 
-    <a href="{{ url_for('dashboard_user') }}" class="sidebar-item">
-        Mes tickets
-    </a>
+  <a href="{{ url_for('tickets_user') }}"
+   class="sidebar-item">
+    Mes tickets
+</a>
 
     <a href="{{ url_for('creer_ticket') }}" class="sidebar-item">
         Nouveau ticket
@@ -166,26 +275,28 @@
             </div>
 
 
-            <div class="topbar-right">
+           <div class="topbar-right">
 
-                <div class="notification-circle">
-                    0
-                </div>
+    <a href="{{ url_for('profil_user') }}"
+       class="user-profile-link">
 
+        <div class="top-user">
+            <strong>
+                {{ current_user.nom }}
+            </strong>
 
-                <div class="top-user">
+            <span>
+                Utilisateur
+            </span>
+        </div>
 
-                    <strong>
-                        {{ current_user.nom }}
-                    </strong>
+        <div class="avatar">
+            {{ current_user.nom[0]|upper }}
+        </div>
 
-                    <span>
-                        Utilisateur
-                    </span>
+    </a>
 
-                </div>
-
-            </div>
+</div>
 
         </div>
 
@@ -224,94 +335,82 @@
 
         </section>
 
+{% with messages = get_flashed_messages(category_filter=["ticket_created"]) %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="ticket-success-alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+     <!-- ================= KPI ================= -->
+
+<section class="user-kpi-grid">
+
+    <article class="user-kpi-card user-kpi-total">
+        <span class="user-kpi-label">
+            Total tickets
+        </span>
+
+        <strong class="user-kpi-value">
+            {{ total_tickets }}
+        </strong>
+
+        <small>
+            Depuis la création du compte
+        </small>
+    </article>
 
 
-        <!-- =====================================================
-             KPI
-        ====================================================== -->
+    <article class="user-kpi-card user-kpi-progress">
 
-        <section class="kpi-grid">
+    <span class="user-kpi-label">
+        En cours
+    </span>
 
+    <strong class="user-kpi-value">
+        {{ tickets_en_cours }}
+    </strong>
 
-            <!-- OUVERTS -->
+    <small>
+        Tickets actuellement en traitement
+    </small>
 
-            <article class="kpi-card">
-
-                <span class="kpi-title">
-                    Tickets ouverts
-                </span>
-
-                <strong>
-                    {{ tickets_ouverts }}
-                </strong>
-
-                <small>
-                    Demandes actuellement ouvertes
-                </small>
-
-            </article>
+</article>
 
 
+    <article class="user-kpi-card user-kpi-waiting">
+        <span class="user-kpi-label">
+            En attente
+        </span>
 
-            <!-- ATTENTE -->
+        <strong class="user-kpi-value">
+            {{ tickets_attente }}
+        </strong>
 
-            <article class="kpi-card">
-
-                <span class="kpi-title">
-                    En attente
-                </span>
-
-                <strong>
-                    {{ tickets_attente }}
-                </strong>
-
-                <small>
-                    Tickets temporairement en attente
-                </small>
-
-            </article>
+        <small>
+            Tickets temporairement en attente
+        </small>
+    </article>
 
 
+    <article class="user-kpi-card user-kpi-resolved">
+        <span class="user-kpi-label">
+            Résolus
+        </span>
 
-            <!-- RESOLUS -->
+        <strong class="user-kpi-value">
+            {{ tickets_resolus }}
+        </strong>
 
-            <article class="kpi-card">
+        <small>
+            Tickets résolus ou fermés
+        </small>
+    </article>
 
-                <span class="kpi-title">
-                    Résolus
-                </span>
-
-                <strong>
-                    {{ tickets_resolus }}
-                </strong>
-
-                <small>
-                    Tickets résolus ou fermés
-                </small>
-
-            </article>
-
-
-
-            <!-- TOTAL -->
-
-            <article class="kpi-card">
-
-                <span class="kpi-title">
-                    Total tickets
-                </span>
-
-                <strong>
-                    {{ total_tickets }}
-                </strong>
-
-                <small>
-                    Depuis la création du compte
-                </small>
-
-            </article>
-
-        </section>
+</section>
 
 
 
@@ -418,13 +517,26 @@
 
                                         <span class="ticket-category">
 
-                                            {% if ticket.categorie %}
-                                                {{ ticket.categorie.nom }}
-                                            {% else %}
-                                                Sans catégorie
-                                            {% endif %}
+    {% if ticket.categorie %}
 
-                                        </span>
+        {% if ticket.categorie.nom|lower == "autre"
+              and ticket.autre_categorie %}
+
+            {{ ticket.autre_categorie }}
+
+        {% else %}
+
+            {{ ticket.categorie.nom }}
+
+        {% endif %}
+
+    {% else %}
+
+        Sans catégorie
+
+    {% endif %}
+
+</span>
 
 
                                         <span
@@ -604,15 +716,23 @@
 
                             <!-- CREE -->
 
-                            <div class="life-step done">
+                            <div class="life-step
+    {% if selected_ticket.statut.value == 'NOUVEAU' %}
+        current
+    {% else %}
+        done
+    {% endif %}"
+>
+    <span>
+        {% if selected_ticket.statut.value == 'NOUVEAU' %}
+            1
+        {% else %}
+            ✓
+        {% endif %}
+    </span>
 
-                                <span>✓</span>
-
-                                <small>
-                                    Créé
-                                </small>
-
-                            </div>
+    <small>Créé</small>
+</div>
 
 
                             <div
@@ -627,12 +747,14 @@
                             <!-- ASSIGNE -->
 
                             <div
-                                class="life-step
-                                {% if selected_ticket.statut.value in
-                                ['ASSIGNE','EN_COURS','EN_ATTENTE','RESOLU','FERME'] %}
-                                    done
-                                {% endif %}"
-                            >
+    class="life-step
+    {% if selected_ticket.statut.value == 'ASSIGNE' %}
+        current
+    {% elif selected_ticket.statut.value in
+    ['EN_COURS','EN_ATTENTE','RESOLU','FERME'] %}
+        done
+    {% endif %}"
+>
 
                                 <span>
                                     2
@@ -778,59 +900,48 @@
                     </div>
 
 
+<div class="detail-block">
 
-                    <!-- =================================================
-                         INFORMATIONS
-                    ================================================== -->
+    <h3>
+        Informations
+    </h3>
 
-                    <div class="detail-block">
+    <div class="comment">
+        <strong>Statut</strong>
+        <p>
+            {{ selected_ticket.statut.value.replace("_", " ") }}
+        </p>
+    </div>
 
-                        <h3>
-                            Informations
-                        </h3>
+    {% if selected_ticket.solution_resolution %}
 
+        <div class="comment">
+            <strong>
+                Solution appliquée
+            </strong>
 
-                        <div class="comment">
+            <p>
+                {{ selected_ticket.solution_resolution }}
+            </p>
+        </div>
 
-                            <strong>
-                                Statut
-                            </strong>
+    {% endif %}
 
-                            <p>
-                                {{ selected_ticket.statut.value.replace("_", " ") }}
-                            </p>
+    <div class="comment">
+        <strong>Priorité</strong>
+        <p>
+            {{ selected_ticket.priorite.value }}
+        </p>
+    </div>
 
-                        </div>
+    <div class="comment">
+        <strong>Date de création</strong>
+        <p>
+            {{ selected_ticket.date_creation.strftime("%d/%m/%Y à %H:%M") }}
+        </p>
+    </div>
 
-
-                        <div class="comment">
-
-                            <strong>
-                                Priorité
-                            </strong>
-
-                            <p>
-                                {{ selected_ticket.priorite.value }}
-                            </p>
-
-                        </div>
-
-
-                        <div class="comment">
-
-                            <strong>
-                                Date de création
-                            </strong>
-
-                            <p>
-                                {{ selected_ticket.date_creation.strftime("%d/%m/%Y à %H:%M") }}
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
+</div>
 
                     <!-- =================================================
                          COMMENTAIRE

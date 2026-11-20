@@ -60,3 +60,11 @@ EN_ATTENTE
 RESOLU
    ↓
 FERME
+
+## Configuration sécurisée
+
+Copier `.env.example` vers `.env` et remplacer toutes les valeurs `REMPLACER...` par des valeurs privées et uniques. Le fichier `.env` est ignoré par Git et Docker.
+
+La variable `SECRET_KEY` est obligatoire pour lancer l'application Flask. Pour créer les comptes de démonstration avec `python create_users.py`, définir au préalable `TEST_USER_PASSWORD`, `TEST_TECH_PASSWORD` et `TEST_ADMIN_PASSWORD` avec des mots de passe uniques.
+
+Ne pas publier de secrets Kubernetes, clés AWS, jetons ou bases de données. La configuration GitLab CI/CD et les manifestes Kubernetes ont été conservés ; les valeurs d'infrastructure doivent être vérifiées avant publication publique.

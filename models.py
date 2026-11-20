@@ -35,6 +35,8 @@ class Utilisateur(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     mot_de_passe_hash = db.Column(db.String(255), nullable=False)
     role = db.Column(db.Enum(RoleUtilisateur), nullable=False)
+
+    service = db.Column(db.String(100), nullable=True)
     date_creation = db.Column(db.DateTime, default=datetime.utcnow)
 
     def set_password(self, mot_de_passe):
@@ -68,6 +70,7 @@ class Ticket(db.Model):
 
     date_creation = db.Column(db.DateTime, default=datetime.utcnow)
     date_resolution = db.Column(db.DateTime, nullable=True)
+    solution_resolution = db.Column(db.Text, nullable=True)
 
     demandeur_id = db.Column(
         db.Integer,
@@ -87,6 +90,12 @@ class Ticket(db.Model):
         nullable=False
     )
 
+
+    autre_categorie = db.Column(
+    db.String(150),
+    nullable=True
+)
+
     # Relations
     demandeur = db.relationship(
         "Utilisateur",
@@ -104,6 +113,10 @@ class Ticket(db.Model):
         "Categorie",
         backref="tickets"
     )
+
+    localisation = db.Column(db.String(150), nullable=True)
+    equipement = db.Column(db.String(150), nullable=True)
+    
 
 class Commentaire(db.Model):
     id = db.Column(db.Integer, primary_key=True)

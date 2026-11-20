@@ -13,8 +13,7 @@
     >
 </head>
 
-<body class="admin-dashboard-page">
-
+<body class="admin-dashboard-page admin-page">
 <div class="app-shell">
 
     <!-- SIDEBAR -->
@@ -86,6 +85,11 @@
     Catégories
 </a>
 
+            <a href="{{ url_for('admin_statistiques') }}"
+   class="sidebar-item">
+    Statistiques
+</a>
+
         </div>
 
 
@@ -128,11 +132,13 @@
     <!-- CONTENU -->
     <main class="user-main">
 
-        <div class="dashboard-header">
+         <div class="admin-page-header">
 
             <div>
 
                 <h1>Gestion des tickets</h1>
+
+                <div class="admin-title-line"></div>
 
                 <p>
                     Consultez, recherchez et gérez l'ensemble des tickets.
@@ -192,31 +198,51 @@
 </div>
 
 
-                <select name="statut">
+                <select name="statut" id="statut">
 
-                    <option value="">
-                        Tous les statuts
-                    </option>
+    <option value="">
+        Tous les statuts
+    </option>
 
-                    {% for statut in statuts %}
+    {% for statut in statuts %}
+        <option
+            value="{{ statut.value }}"
+            {% if statut_selectionne == statut.value %}selected{% endif %}
+        >
+            {{ statut.value.replace('_', ' ') }}
+        </option>
+    {% endfor %}
 
-                        <option
-                            value="{{ statut.value }}"
-                            {% if statut_selectionne == statut.value %}
-                                selected
-                            {% endif %}
-                        >
-                            {{ statut.value.replace('_', ' ') }}
-                        </option>
+</select>
 
-                    {% endfor %}
+<div class="ticket-date-filter">
+    <label>
+        Du
+        <input
+            type="date"
+            name="date_debut"
+            value="{{ date_debut or '' }}"
+        >
+    </label>
+</div>
 
-                </select>
+<div class="ticket-date-filter">
+    <label>
+        Au
+        <input
+            type="date"
+            name="date_fin"
+            value="{{ date_fin or '' }}"
+        >
+    </label>
+</div>
 
-
+<button type="submit" class="filter-date-btn">
+    Filtrer
+</button>
   
 
-                {% if recherche or statut_selectionne %}
+               {% if recherche or statut_selectionne or date_debut or date_fin %}
 
                     <a
                         href="{{ url_for('admin_tickets') }}"
@@ -366,7 +392,79 @@
 
                             </form>
 
+
                         {% endif %}
+
+                        {% if ticket.statut.value == "RESOLU" %}
+
+    <div class="admin-resolution-validation">
+
+        <div class="resolution-info">
+
+            <strong>
+                Solution proposée par le technicien
+            </strong>
+
+            <p>
+                {{ ticket.solution_resolution or
+                   "Aucune solution renseignée." }}
+            </p>
+
+        </div>
+
+
+        <div class="resolution-actions">
+
+            <!-- REFUS -->
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'refuser_resolution_admin',
+                    ticket_id=ticket.id
+                ) }}"
+                class="refuse-resolution-form"
+            >
+
+                <textarea
+                    name="motif_refus"
+                    rows="3"
+                    placeholder="Motif du refus..."
+                    required
+                ></textarea>
+
+                <button
+                    type="submit"
+                    class="action-button danger"
+                >
+                    Refuser la résolution
+                </button>
+
+            </form>
+
+
+            <!-- VALIDATION -->
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'valider_resolution_admin',
+                    ticket_id=ticket.id
+                ) }}"
+            >
+
+                <button
+                    type="submit"
+                    class="action-button success"
+                >
+                    Valider la résolution
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+{% endif %}
 
                     </div>
 
